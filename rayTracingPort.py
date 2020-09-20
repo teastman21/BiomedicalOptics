@@ -2,7 +2,7 @@
 """
 Ray Tracing Model
 
-Ported from M. Durst's Mathematica Document
+With help from M. Durst's Mathematica Document
 
 By @Tommy Eastman
 
@@ -10,9 +10,15 @@ By @Tommy Eastman
 
 
 """
-So far I have coordinate values at "critical points" (need to know exactly
-what these critical points are) auto-populate into a single dictionary
-(is a an array a better idea?) where they can be extracted from later 
+@TE
+Steps forward
+    diffraction grating
+    this will initalize angle for light
+    current framework should work just add diffraction grating functions
+    then likely add features like parallel processing
+        python multiprocessing package should work well for this
+        need to understand difference between synch and asynch
+        
 """
 
 f1 = 40
@@ -24,6 +30,12 @@ f3 = 30
 d4 = 35
 
 import numpy as np
+# @TE reminder to use matplotlib to create visual representation of raytracing
+import matplotlib.pyplot as plt
+
+#moved this into first function because we can't declare an empty numpy array
+#points = np.array([])
+
 
 def propagation(d):
     """applies propagation matrix through a distance d
@@ -47,11 +59,15 @@ def init_array(angle):
 def position0(angle):
     """returns coordinates at initial position
     """
-    """@Tommy OK this is sloppy coding need to clean this up but got stuck in documentation
+    """@TE sloppy coding I need to clean this up but got stuck in documentation
     but it cant be hard to do!!"""
+    
+    #clean this up its ugly
+    global points
     x = int(init_array(angle)[0])
-    c = np.array([x,0])
-    return c
+    pos0 = np.array([x,0])
+    points = np.array([pos0])
+    return pos0
 
 def array1(angle):
     """propagate over the distance to d1
@@ -63,9 +79,14 @@ def position1(angle):
     """returns x,y coordinates at lens 1 and stores them in the dictionary
     """
     
-    """@Tommy there is a strange space in the output, figure this out"""
-    
-    pos1 = np.array([d1 + int(position0(angle)[0]), int(array1(angle)[0])])
+    """@TE there is a strange space in the output, figure this out"""
+    #Learned that numpy adds the strange space for floats in case of a negative sign
+    #@TE fix the sloppy code you created while trying to debug here
+    global points
+    p = int(d1 + int(position0(angle)[0]))
+    p2 = int(array1(angle)[0])
+    pos1 = np.array([p,p2])
+    points = np.append(points,[pos1],axis=0) 
     return pos1
 
 def array2(angle):
@@ -79,8 +100,9 @@ def position2(angle):
     """
     returns the x,y coordinates at the second lens and stores them in dic
     """
-
+    global points
     pos2 = np.array([d2 + int(position1(angle)[0]),int(array2(angle)[0])])
+    points = np.append(points,[pos2],axis=0)
     return pos2
     
 def array3(angle):
@@ -94,8 +116,9 @@ def position3(angle):
     """
     returns the x,y coordinates at the third lens and stores them in dic
     """
-
+    global points
     pos3 = np.array([d3 + int(position2(angle)[0]),int(array3(angle)[0])])
+    points = np.append(points,[pos3],axis=0)
     return pos3
         
 def array4(angle):
@@ -109,16 +132,24 @@ def position4(angle):
     """
     returns the x,y coordinates at the focal plane and stores them in dic
     """
-
+    global points
     pos4 = np.array([d4 + int(position3(angle)[0]), int(array4(angle)[0])])
-    return pos4   
+    points = np.append(points,[pos4],axis=0)
+    return pos4
+
+def display():
+    """returns a plot of the generated ray tracing
+    """
+    #@TE i need to make this graphic better... perhaps dynamic?
+    x = points[:,0]
+    y = points[:,1]
+    plt.plot(x,y)
+    plt.show()
 
 
-"""running position4 will propagate through the model @Tommy add a way to populate
-a dictionary so that we can look back at the critical locations
-"""
-
-print(position4(20))
+#cant remember if pi is built into pyth look this up
+position4(3.14159/4)
+display()
 
 
 
