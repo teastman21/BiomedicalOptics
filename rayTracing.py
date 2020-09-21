@@ -32,6 +32,7 @@ d4 = 35
 import numpy as np
 # @TE reminder to use matplotlib to create visual representation of raytracing
 import matplotlib.pyplot as plt
+import math as math
 
 #moved this into first function because we can't declare an empty numpy array
 #points = np.array([])
@@ -144,8 +145,7 @@ def display():
     plt.show()
 
 
-#cant remember if pi is built into pyth look this up
-position4(3.14159/4)
+position4(math.pi)/4)
 display()
 
 

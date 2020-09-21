@@ -38,6 +38,7 @@ def propTF(u1,L,lam,z):
     for i in np.arange(-1 / (2 * dx),1/L,abs((2*dx)-1/L)):
         points = np.append(points, [np.array([i,i])],axis=0)
     print(points)
+    #need to figure out how to do elementwise operations in np arrays
     h = math.exp(-c.sqrt(-1) * math.pi * lam * z * (points**2).sum(-1))
     print(h)
     #I think it is impossbile to use range with floats in any way, so I will have to hand code a float function
