@@ -20,7 +20,10 @@ Steps forward
         need to understand difference between synch and asynch
         
 """
-
+import numpy as np
+# @TE reminder to use matplotlib to create visual representation of raytracing
+import matplotlib.pyplot as plt
+import math as math
 f1 = 40
 d1 = f1
 d2 = 20
@@ -28,16 +31,26 @@ f2 = -50
 d3 = 10
 f3 = 30
 d4 = 35
+m = 1
+g = 120000
+lamC = 800*10**(-9)
+thetaDcenter = 0
+thetaI = np.arcsin(m * lamC * g - np.sin(thetaDcenter))
+print(thetaI)
 
-import numpy as np
-# @TE reminder to use matplotlib to create visual representation of raytracing
-import matplotlib.pyplot as plt
-import math as math
 
 #moved this into first function because we can't declare an empty numpy array
 #points = np.array([])
 
 
+def diffract(lam):
+    """returns diffraction angle
+    """
+    global m,g,thetaI
+    thetaD = np.arcsin(m*lam*g-np.sin(thetaI))
+    return thetaD
+
+'''
 def propagation(d):
     """applies propagation matrix through a distance d
     """
@@ -148,6 +161,5 @@ def display():
 position4(math.pi)/4)
 display()
 
-
-
+'''
 
