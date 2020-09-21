@@ -64,8 +64,7 @@ def position0(angle):
     
     #clean this up its ugly
     global points
-    x = int(init_array(angle)[0])
-    pos0 = np.array([x,0])
+    pos0 = np.array([int(init_array(angle)[0]),0])
     points = np.array([pos0])
     return pos0
 
@@ -83,9 +82,7 @@ def position1(angle):
     #Learned that numpy adds the strange space for floats in case of a negative sign
     #@TE fix the sloppy code you created while trying to debug here
     global points
-    p = int(d1 + int(position0(angle)[0]))
-    p2 = int(array1(angle)[0])
-    pos1 = np.array([p,p2])
+    pos1 = np.array([int(d1 + int(position0(angle)[0])), int(array1(angle)[0])])
     points = np.append(points,[pos1],axis=0) 
     return pos1
 
