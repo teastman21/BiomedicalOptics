@@ -39,7 +39,7 @@ g = 120000
 lamC = 800*10**(-9)
 thetaDcenter = 0
 thetaI = np.arcsin(m * lamC * g - np.sin(thetaDcenter))
-print(thetaI)
+
 
 
 #moved this into first function because we can't declare an empty numpy array
@@ -82,7 +82,6 @@ def position0(angle):
     #clean this up its ugly
     global points
     pos0 = np.array([init_array(angle)[0,0],0])
-    print(pos0)
     #points = np.array([pos0])
     #@TE points prints out weird form take a look and fix
     points = [pos0]
@@ -103,10 +102,7 @@ def position1(angle):
     #@TE fix the sloppy code you created while trying to debug here
     global points
     pos1 = np.array([d1 + position0(angle)[0], array1(angle)[0,0]])
-    print(points)
-    print(pos1)
     points = np.append(points,[pos1],axis=0)
-    print(points)
     return pos1
 
 def array2(angle):
@@ -139,7 +135,6 @@ def position3(angle):
     global points
     pos3 = np.array([d3 + position2(angle)[0],array3(angle)[0,0]])
     points = np.append(points,[pos3],axis=0)
-    print(points)
     return pos3
 '''        
 def array4(angle):

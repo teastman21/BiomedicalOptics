@@ -15,8 +15,6 @@ import decimal as d
 import cmath as c
 import matplotlib.pyplot as plt
 
-x = np.array([[1,2,3],[4,5,6],[1,2,3],[4,5,6],[1,2,3],[4,5,6],[1,2,3],[4,5,6],[1,2,3],[4,5,6],[1,2,3],[4,5,6],[1,2,3],[4,5,6],[1,2,3],[4,5,6],[1,2,3],[4,5,6],[1,2,3],[4,5,6],[1,2,3],[4,5,6],[1,2,3],[4,5,6],[1,2,3],[4,5,6]])
-
 
 
 def propTF(u1,L,lam,z):
@@ -37,29 +35,6 @@ def propTF(u1,L,lam,z):
     U2 = H * U1
     u2 = np.fft.ifftshift(np.fft.ifft2(U2))
     
-
-
-
-def decimal_range(start, stop, step):
-    #so return hasn't worked will have to try a while-yield loop
-    #need to store start so we can return the final result
-    beg = start
-    while start <= stop:
-        yield float(start)
-        start += d.Decimal(step)
-    return(list(decimal_range(beg, stop, step)))
-#ok this failed yet again
-
-#turns out numpy has a function that did this the whole time :-(
-# for i in arange(start,stop,step)
-        
- 
-"""     
-lis=[]        
-for i in np.arange(-1,100,.66):
-    print(i)
-    lis.append(i)
-"""      
 
 #chapter 6 page 90
 #page 208/209
