@@ -43,33 +43,6 @@ def rect(x):
     out = np.abs(x) <= 1/2
     return out
 
-'''
-#page 66 square beam example
-L1 = 0.5
-M = 250
-dx1 = L1/M
-x1 = np.arange((-L1/2),(L1/2 -dx1), dx1)
-y1 = x1       
-lam = 0.5*10**(-6)
-k=2*math.pi/lam
-w=0.051
-z=2000
-
-X1,Y1 = np.meshgrid(x1,y1)
-u1 = rect(X1/(2*w)) * rect(Y1/(2*w))
-I1=np.abs(u1**2)
-
-plt.figure()
-plt.imshow(I1)
-
-u2 = propTF(u1,L1,lam,z)
-x2=x1
-y2=y1
-I2=np.abs(u2)**2
-
-plt.figure()
-plt.imshow(I2)
-'''
 
 def tilt(uin, L, lam, alpha, theta):
     """ported from tilt function, Voelz pg 90
@@ -86,38 +59,7 @@ def tilt(uin, L, lam, alpha, theta):
     uout = uin * np.exp(-1j * k * (X * np.cos(theta) + Y*np.sin(theta)) * np.tan(alpha))
     return uout
 
-"""
-#page 66 square beam example for TILT
-L1 = 0.5
-M = 250
-dx1 = L1/M
-x1 = np.arange((-L1/2),(L1/2 -dx1), dx1)
-y1 = x1       
-lam = 0.5*10**(-6)
-k=2*math.pi/lam
-w=0.051
-z=2000
 
-X1,Y1 = np.meshgrid(x1,y1)
-u1 = rect(X1/(2*w)) * rect(Y1/(2*w))
-I1=np.abs(u1**2)
-
-plt.figure()
-plt.imshow(I1)
-
-deg = math.pi/180
-alpha = 5.05 * 10 **-5
-theta = 45 * deg
-u1 = tilt(u1,L1,lam,alpha,theta)
-
-u2 = propTF(u1,L1,lam,z)
-x2=x1
-y2=y1
-I2=np.abs(u2)**2
-
-plt.figure()
-plt.imshow(I2)
-"""
 
 
 def focus(uin, L, lam, zf):
@@ -133,37 +75,7 @@ def focus(uin, L, lam, zf):
     return uout
 
 
-"""
-#SQ BM TEST FOR FOCUS
-#page 66 square beam example
-L1 = 0.5
-M = 250
-dx1 = L1/M
-x1 = np.arange((-L1/2),(L1/2 -dx1), dx1)
-y1 = x1       
-lam = 0.5*10**(-6)
-k=2*math.pi/lam
-w=0.051
-z=2000
 
-X1,Y1 = np.meshgrid(x1,y1)
-u1 = rect(X1/(2*w)) * rect(Y1/(2*w))
-I1=np.abs(u1**2)
-
-plt.figure()
-plt.imshow(I1)
-
-zf = 2000
-u1 = focus(u1, L1, lam, zf)
-
-u2 = propTF(u1,L1,lam,z)
-x2=x1
-y2=y1
-I2=np.abs(u2)**2
-
-plt.figure()
-plt.imshow(I2)
-"""
 
 def propff(u1,L1,lam,z):
     """propFF port from pg 80
@@ -183,8 +95,7 @@ def propff(u1,L1,lam,z):
     return u2
 
 
-''' SQ BM TEST FOR PROPFF '''
-"""
+#page 66 square beam example
 L1 = 0.5
 M = 250
 dx1 = L1/M
@@ -192,7 +103,7 @@ x1 = np.arange((-L1/2),(L1/2 -dx1), dx1)
 y1 = x1       
 lam = 0.5*10**(-6)
 k=2*math.pi/lam
-w=0.011
+w=0.051
 z=2000
 
 X1,Y1 = np.meshgrid(x1,y1)
@@ -202,25 +113,14 @@ I1=np.abs(u1**2)
 plt.figure()
 plt.imshow(I1)
 
-
 u2 = propTF(u1,L1,lam,z)
-u2,L2 = propff(u1,L1,lam,z)
-dx2 = L2/M
-x2=np.arange(-L1/2,L2/2-dx2,dx2)
-y2=x2
+x2=x1
+y2=y1
 I2=np.abs(u2)**2
 
 plt.figure()
 plt.imshow(I2)
-    
-    """
-    
 
-    
-    
-    
-    
-    
     
 
 
