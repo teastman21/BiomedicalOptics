@@ -113,6 +113,15 @@ I1=np.abs(u1**2)
 plt.figure()
 plt.imshow(I1)
 
+"""
+deg = math.pi/180
+alpha = 5.0 * 10 **-5
+theta = 45 *deg
+u1 = tilt(u1,L1,lam,alpha,theta)
+"""
+zf = 2000 
+u1 = focus(u1,L1,lam,zf)
+
 u2 = propTF(u1,L1,lam,z)
 x2=x1
 y2=y1
