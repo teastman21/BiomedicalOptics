@@ -7,8 +7,8 @@ Created on Sat Sep 19 21:20:07 2020
 
 @author: Tommy Eastman
 
-
 """
+
 import numpy as np
 import math as math
 import decimal as d
@@ -119,6 +119,7 @@ alpha = 5.0 * 10 **-5
 theta = 45 *deg
 u1 = tilt(u1,L1,lam,alpha,theta)
 """
+
 zf = 2000 
 u1 = focus(u1,L1,lam,zf)
 
