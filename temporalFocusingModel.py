@@ -93,7 +93,7 @@ if isinstance(u3x, np.ndarray):
 else:
     print("No np")
 #final coordinates
-fc = np.vstack((u3x,u3y)).T
+fc = np.meshgrid((u3x,u3y))
 if isinstance(fc, np.ndarray):
     print("yes np")
 else:
