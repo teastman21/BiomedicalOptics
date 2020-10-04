@@ -27,8 +27,8 @@ L = 1.05
 M = 2**16
 dx = L / M
 dy = L / M
-x = np.arange(-L/2, L / 2 - dx + .000000001, dx)
-y = np.arange(-L/2, L / 2 - dy + .000000001, dy)
+x = np.arange(-L/2, L / 2 - dx + .000000000000000001, dx)
+y = np.arange(-L/2, L / 2 - dy + .000000000000000001, dy)
 alpha = 5.0*10**-5 #tilt angle
 k = 2 * math.pi / lamC
 
@@ -47,7 +47,7 @@ def tilt(uin, L, lam, alpha, theta):
     #need to add the small fraction to make end range inclusive
     #solution for a clean fix are write a handmade range function that
     #includes the end range
-    x = np.arange((-L/2), (L/2)-dx + .0000000000000001, dx)
+    x = np.arange((-L/2), (L/2)-dx + .0000000000000000001, dx)
     X,Y = np.meshgrid(x, x)
     uout = uin * np.exp(-1j * k * (X * np.cos(theta) + Y*np.sin(theta)) * np.tan(alpha))
     return uout
@@ -98,9 +98,11 @@ if isinstance(fc, np.ndarray):
     print("yes np")
 else:
     print("No np")
+
+
 I=np.abs(fc)**2
 
-print(fc)
+print(I)
 plt.figure()
 plt.imshow(I)
 
