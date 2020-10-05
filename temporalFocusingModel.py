@@ -41,7 +41,7 @@ y = np.arange(-L/2, L / 2 - dy + .000000000000000001, dy)
 alpha = 5.0*10**-5 #tilt angle
 k = 2 * math.pi / lamC
 
-#initialize diffraction angle
+#determine diffraction angle
 thetaI = np.arcsin(m * lamC * g - np.sin(thetaDcenter))
 
 
@@ -61,45 +61,74 @@ def tilt(uin, L, lam, alpha, theta):
     uout = uin * np.exp(-1j * k * (X * np.cos(theta) + Y*np.sin(theta)) * np.tan(alpha))
     return uout
 
-def rect(x):
-    out = np.abs(x) <= 1/2
-    return out
 
 #initialize beam and apply tilt
 u1x = np.exp(-x ** 2 / (2 * w ** 2))* np.exp(-1j * k * (x * np.cos(thetaI) + y*np.sin(thetaI)) * np.tan(alpha))
 u1y = np.exp(-y ** 2 / (2 * w ** 2))* np.exp(-1j * k * (x * np.cos(thetaI) + y*np.sin(thetaI)) * np.tan(alpha))
+U1X,U1Y = np.meshgrid(u1x,u1y)
+
+#plot beam after tilt applied
+I=np.abs(U1X)**2
+plt.figure()
+plt.imshow(I)
 
 
 if isinstance(u1x, np.ndarray):
     print("yes np")
 else:
     print("No np")
-#propagate to the focal plane
-L2 = lamC * f1 / dx
+#propagate to the focal plane (x)
+L2X = lamC * f1 / dx
 dx2 = lamC * f1 / L
+
+
+#y
 L2Y = lamC * f1 / dx
 dy2 = lamC * f1 / L
 
 #create coordinates at focal plane
-xfoc1 = -L2 / 2 + np.arange(0, M - 1) * dx2
+xfoc1 = -L2X / 2 + np.arange(0, M - 1) * dx2
+yfoc1  = -L2Y / 2 + np.arange(0, M - 1) * dy2
 
 #propagate beam with the fourier transform
 u2x = 1/(1j * lamC * f1)*(np.fft.ifftshift(np.fft.fft(np.fft.fftshift(u1x))))*dx
 u2y = 1/(1j * lamC * f1)*(np.fft.ifftshift(np.fft.fft(np.fft.fftshift(u1y))))*dy
+
+#plot beam at fourier plane
+U2X,U2Y = np.meshgrid(u2x,u2y)
+I=np.abs(U2X)**2
+plt.figure()
+plt.imshow(I)
+
+
+
 if isinstance(u2x, np.ndarray):
     print("yes np")
 else:
     print("No np")
+    
 #propagate to output focal plane
-L3 = lamC * f2 / dx2
-dx3 = lamC * f2 / L2
+L3X = lamC * f2 / dx2
+dx3 = lamC * f2 / L2X
+
+L3Y = lamC * f2 / dy2
+dy3 = lamC * f2 / L2Y
  
 #create coordinates at output focal plane
-xfoc2 = -L3 / 2 + np.arange(0, M-1) * dx3
+xfoc2 = -L3X / 2 + np.arange(0, M - 1) * dx3
+yfoc2 = -L3Y / 2 + np.arange(0, M - 1) * dy3
 
 #propagate beam with fourier transform
 u3x = 1/(1j * lamC * f2)*(np.fft.ifftshift(np.fft.fft(np.fft.fftshift(u2x))))*dx2 
 u3y = 1/(1j * lamC * f2)*(np.fft.ifftshift(np.fft.fft(np.fft.fftshift(u2y))))*dy2 
+
+#plot beam at output plane
+U3X,U3Y = np.meshgrid(u3x,u3y)
+I=np.abs(U3X)**2
+plt.figure()
+plt.imshow(I)
+
+
 if isinstance(u3x, np.ndarray):
     print("yes np")
 else:
@@ -116,11 +145,7 @@ else:
     
 print(len(fc))
 I=np.abs(fc)**2
-print(len(I))
-print(np.shape(I))
-print(I)
-plt.figure()
-plt.imshow(I)
+
 
 
 

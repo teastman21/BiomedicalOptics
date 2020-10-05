@@ -28,12 +28,16 @@ def propTF(u1,L,lam,z):
     
     #this combines the initialization of fx and the [FX,FY] step
     fx = np.arange(-1 / (2 * dx), 1/(2*dx)-1/L,1/L)
+    print(np.shape(fx))
     FX,FY=np.meshgrid(fx,fx)
+    print(FX)
+    print(FY)
     H = np.exp(1j *math.pi * lam * z * (FX**2 + FY**2))
     H = np.fft.fftshift(H)
     U1=np.fft.fft2(np.fft.fftshift(u1))
     U2 = H * U1
     u2 = np.fft.ifftshift(np.fft.ifft2(U2))
+    print(np.shape(u2))
     return u2
 
 #chapter 6 page 90
@@ -110,7 +114,7 @@ X1,Y1 = np.meshgrid(x1,y1)
 u1 = rect(X1/(2*w)) * rect(Y1/(2*w))
 I1=np.abs(u1**2)
 print(np.shape(I1))
-print(I1)
+
 plt.figure()
 plt.imshow(I1)
 
