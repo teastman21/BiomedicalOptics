@@ -8,6 +8,14 @@ Created on Wed Sep 30 21:51:19 2020
 @author: Tommy Eastman
 """
 
+"""
+Questions for M Durst:
+    1. How to plot if we are in 1D?
+    2. Struggling tying diffraction grating in
+    3. If we are in 1D are we abandoning these functions or should they 
+    be re-written to account for 1 Dimension
+    4. 
+"""
 
 # import necessary packages 
 import numpy as np
@@ -25,8 +33,9 @@ m = 1           #diffraction order
 w = 0.002       #beam width
 L = 1.05
 M = 2**16
-dx = L / M
-dy = L / M
+# multiplied these two by a hundred due to CPU memory constraints @ output
+dx = 100*L / M
+dy = 100* L / M
 x = np.arange(-L/2, L / 2 - dx + .000000000000000001, dx)
 y = np.arange(-L/2, L / 2 - dy + .000000000000000001, dy)
 alpha = 5.0*10**-5 #tilt angle
@@ -52,6 +61,9 @@ def tilt(uin, L, lam, alpha, theta):
     uout = uin * np.exp(-1j * k * (X * np.cos(theta) + Y*np.sin(theta)) * np.tan(alpha))
     return uout
 
+def rect(x):
+    out = np.abs(x) <= 1/2
+    return out
 
 #initialize beam and apply tilt
 u1x = np.exp(-x ** 2 / (2 * w ** 2))* np.exp(-1j * k * (x * np.cos(thetaI) + y*np.sin(thetaI)) * np.tan(alpha))
@@ -93,19 +105,22 @@ if isinstance(u3x, np.ndarray):
 else:
     print("No np")
 #final coordinates
-fc = np.meshgrid((u3x,u3y))
+#fc = np.meshgrid(u3x,u3y)
+    #need to turn fc into x y pairs!
+fc = np.column_stack((u3x,u3y))
+print(np.shape(fc))
 if isinstance(fc, np.ndarray):
     print("yes np")
 else:
     print("No np")
-
-
+    
+print(len(fc))
 I=np.abs(fc)**2
-
+print(len(I))
+print(np.shape(I))
 print(I)
 plt.figure()
 plt.imshow(I)
-
 
 
 
