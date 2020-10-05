@@ -10,11 +10,10 @@ Created on Wed Sep 30 21:51:19 2020
 
 """
 Questions for M Durst:
-    1. How to plot if we are in 1D?
-    2. Struggling tying diffraction grating in
-    3. If we are in 1D are we abandoning these functions or should they 
-    be re-written to account for 1 Dimension
-    4. 
+ is diffraction grating tied in properly?
+ is this beam right?
+ 
+ 
 """
 
 # import necessary packages 
@@ -66,11 +65,11 @@ def tilt(uin, L, lam, alpha, theta):
 u1x = np.exp(-x ** 2 / (2 * w ** 2))* np.exp(-1j * k * (x * np.cos(thetaI) + y*np.sin(thetaI)) * np.tan(alpha))
 u1y = np.exp(-y ** 2 / (2 * w ** 2))* np.exp(-1j * k * (x * np.cos(thetaI) + y*np.sin(thetaI)) * np.tan(alpha))
 U1X,U1Y = np.meshgrid(u1x,u1y)
-
+print(np.shape(u1x))
 #plot beam after tilt applied
 I=np.abs(U1X)**2
 plt.figure()
-plt.imshow(I)
+plt.plot(np.abs(u1x)**2)
 
 
 if isinstance(u1x, np.ndarray):
