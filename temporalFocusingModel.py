@@ -9,9 +9,8 @@ Created on Wed Sep 30 21:51:19 2020
 """
 
 """
-Questions for M Durst:
- is diffraction grating tied in properly?
- is this beam right?
+This branch version is to pass a 2-d np array (x value and wavelength)
+so as to remove the need for a for loop
  
  
 """
