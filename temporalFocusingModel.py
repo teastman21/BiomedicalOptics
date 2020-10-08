@@ -34,7 +34,7 @@ def prop(lamm):
     L = 1.05
     M = 2**10
     
-    # multiplied these two by a hundred due to CPU memory constraints @ output
+    #multiplied these two by a hundred due to CPU memory constraints @ output
     dx = L / M
     dy = L / M
     x = np.arange(-L/2, L / 2 - dx + .000000000000000001, dx)
@@ -85,8 +85,6 @@ def prop(lamm):
     
     plt.figure()
     plt.plot(np.abs(u2y)**2)
-    
-    
         
     #propagate to output focal plane
     L3X = lam1 * f2 / dx2
@@ -123,8 +121,6 @@ def prop(lamm):
 wavelengthlist = np.linspace(780*10**(-9),820*10**(-9),num=2)
 for lamb in wavelengthlist:
     prop(lamb)
-    display()
-
 
 
 
