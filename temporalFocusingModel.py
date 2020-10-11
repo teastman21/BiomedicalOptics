@@ -19,6 +19,8 @@ so as to remove the need for a for loop
 import numpy as np
 import math as math
 import matplotlib.pyplot as plt
+from multiprocessing import Pool
+
 
 
 def prop(lamm): 
@@ -53,11 +55,12 @@ def prop(lamm):
     #U1X,U1Y = np.meshgrid(u1x,u1y)
     #plot beam after tilt applied
     #I=np.abs(U1X)**2
-    plt.figure()
-    plt.plot(np.abs(u1x)**2)
-    
-    plt.figure()
-    plt.plot(np.abs(u1y)**2)
+   # plt.figure()
+    plotU1X = np.abs(u1x)**2
+    #plt.plot(np.abs(u1x)**2)
+    #plt.show()
+    #plt.figure()
+    #plt.plot(np.abs(u1y)**2)
     
     #propagate to the focal plane (x)
     L2X = lam1 * f1 / dx
@@ -79,11 +82,12 @@ def prop(lamm):
     #plot beam at fourier plane
     #U2X,U2Y = np.meshgrid(u2x,u2y)
     #I=np.abs(U2X)**2
-    plt.figure()
-    plt.plot(np.abs(u2x)**2)
-    
-    plt.figure()
-    plt.plot(np.abs(u2y)**2)
+    #plt.figure()
+    plotU2X = np.abs(u2x)**2
+    #plt.plot(np.abs(u2x)**2)
+    #plt.show()
+    #plt.figure()
+    #plt.plot(np.abs(u2y)**2)
         
     #propagate to output focal plane
     L3X = lam1 * f2 / dx2
@@ -105,23 +109,28 @@ def prop(lamm):
     #I=np.abs(U3X)**2
     plt.figure()
     plt.plot(np.abs(u3x)**2)
-    
-    plt.figure()
-    plt.plot(np.abs(u3y)**2)
+    plotU3X = np.abs(u3x)**2
+    #plt.plot(np.abs(u3y)**2)
     
     
     #final coordinates
     #fc = np.meshgrid(u3x,u3y)
         #need to turn fc into x y pairs!
-    fc = np.column_stack((u3x,u3y))
-    I=np.abs(fc)**2
+   # fc = np.column_stack((u3x,u3y))
+   # I=np.abs(fc)**2
+    return np.array(plotU1X,plotU2X,plotU3X)
 
-
-wavelengthlist = np.linspace(780*10**(-9),820*10**(-9),num=2)
+#for use with parallel kernels
+wavelengthlist = np.linspace(780*10**(-9),820*10**(-9),num=1)
 for lamb in wavelengthlist:
-    prop(lamb)
+#lamb = 800*10**(-9) 
 
 
+"""
+if __name__ == '__main__':
+    pool = Pool()
+    pool.map(prop, wavelengthlist)
+"""  
 
 
 
