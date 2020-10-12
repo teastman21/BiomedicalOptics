@@ -21,7 +21,21 @@ import math as math
 import matplotlib.pyplot as plt
 from multiprocessing import Pool
 
+global x1c
+global x2c
+global x3c
+M = 2**10
 
+def initialize():
+    """initialize the np arrays for the coordinate build up
+        only run once at beginning!
+        """
+    global x1c
+    global x2c
+    global x3c
+    x1c = np.array([])
+    x2c = np.array([])
+    x3c = np.array([])
 
 def prop(lamm): 
     # Define necessary variables
@@ -34,7 +48,9 @@ def prop(lamm):
     w = 0.002       #beam width
     L = 1.05
     M = 2**10
-    
+    global x1c
+    global x2c
+    global x3c
     #multiplied these two by a hundred due to CPU memory constraints @ output
     dx = L / M
     dy = L / M
@@ -57,6 +73,7 @@ def prop(lamm):
     #I=np.abs(U1X)**2
    # plt.figure()
     plotU1X = np.abs(u1x)**2
+    x1c = np.append(x1c,plotU1X)
     #plt.plot(np.abs(u1x)**2)
     #plt.show()
     #plt.figure()
@@ -84,6 +101,7 @@ def prop(lamm):
     #I=np.abs(U2X)**2
     #plt.figure()
     plotU2X = np.abs(u2x)**2
+    x2c = np.append(x2c,plotU2X)
     #plt.plot(np.abs(u2x)**2)
     #plt.show()
     #plt.figure()
@@ -103,13 +121,12 @@ def prop(lamm):
     #propagate beam with fourier transform
     u3x = 1/(1j * lam1 * f2)*(np.fft.ifftshift(np.fft.fft(np.fft.fftshift(u2x))))*dx2 
     u3y = 1/(1j * lam1 * f2)*(np.fft.ifftshift(np.fft.fft(np.fft.fftshift(u2y))))*dy2 
-    
     #plot beam at output plane
     #U3X,U3Y = np.meshgrid(u3x,u3y)
     #I=np.abs(U3X)**2
-    plt.figure()
-    plt.plot(np.abs(u3x)**2)
+    #plt.plot(np.abs(u3x)**2)
     plotU3X = np.abs(u3x)**2
+    x3c = np.append(x3c,plotU3X)
     #plt.plot(np.abs(u3y)**2)
     
     
@@ -118,13 +135,52 @@ def prop(lamm):
         #need to turn fc into x y pairs!
    # fc = np.column_stack((u3x,u3y))
    # I=np.abs(fc)**2
-    return np.array(plotU1X,plotU2X,plotU3X)
 
 #for use with parallel kernels
-wavelengthlist = np.linspace(780*10**(-9),820*10**(-9),num=1)
+initialize()
+wavelengthlist = np.linspace(780*10**(-9),820*10**(-9),num=3)
 for lamb in wavelengthlist:
+    prop(lamb)
 #lamb = 800*10**(-9) 
+"""
+plt.figure()
+plt.plot(x1c[1:M-1])
+plt.plot(x1c[M:])
+plt.figure()
+plt.plot(x2c[1:M-1])
+plt.plot(x2c[M:])
+plt.figure()
+plt.plot(x3c[1:M-1])
+plt.plot(x3c[M:])
+"""
+def display(x1c,x2c,x3c):
+    """displays plots at the focal plane at different wavelengths
+    """
+    x = 0
+    y = 1
+    plt.figure()
+    while x <= len(x1c):
+        plt.plot(x1c[x:y*M])
+        x = y * M
+        y = y + 1
+    
+    x = 0
+    y = 1
+    plt.figure()
+    while x <= len(x2c):
+        plt.plot(x2c[x:y*M])
+        x = y * M
+        y = y + 1
+        
+    x = 0
+    y = 1
+    plt.figure()
+    while x <= len(x3c):
+        plt.plot(x3c[x:y*M])
+        x = y * M
+        y = y + 1
 
+display(x1c,x2c,x3c)
 
 """
 if __name__ == '__main__':
