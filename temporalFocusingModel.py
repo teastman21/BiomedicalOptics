@@ -8,13 +8,6 @@ Created on Wed Sep 30 21:51:19 2020
 @author: Tommy Eastman
 """
 
-"""
-This branch version is to pass a 2-d np array (x value and wavelength)
-so as to remove the need for a for loop
- 
- 
-"""
-
 # import necessary packages 
 import numpy as np
 import math as math
@@ -48,9 +41,12 @@ def prop(lamm):
     w = 0.002       #beam width
     L = 1.05
     M = 2**10
+
+    zs = 100        #defocus slices
     global x1c
     global x2c
     global x3c
+    
     #multiplied these two by a hundred due to CPU memory constraints @ output
     dx = L / M
     dy = L / M
@@ -92,7 +88,7 @@ def prop(lamm):
     #propagate beam with the fourier transform
     u2x = 1/(1j * lam1 * f1)*(np.fft.ifftshift(np.fft.fft(np.fft.fftshift(u1x))))*dx
     u2y = 1/(1j * lam1 * f1)*(np.fft.ifftshift(np.fft.fft(np.fft.fftshift(u1y))))*dy
-    
+    print(u2x)
     #plot beam at fourier plane
     #U2X,U2Y = np.meshgrid(u2x,u2y)
     #I=np.abs(U2X)**2
@@ -121,10 +117,34 @@ def prop(lamm):
     x3c = np.append(x3c,plotU3X)
     #plt.plot(np.abs(u3y)**2)
     
- 
-#for use with parallel kernels
+
+    plt.figure()
+    plt.plot(np.abs(u3y)**2)
+    
+    
+    #final coordinates
+    #fc = np.meshgrid(u3x,u3y)
+        #need to turn fc into x y pairs!
+    #fc = np.column_stack((u3x,u3y))
+    #I=np.abs(fc)**2
+    
+    fx = (-1 / (2 * dx3) + np.arange(0,M-1,1)*1/L3X)
+    
+    #attempt to defocus 
+        
+    H = np.exp(1j *math.pi * lam1 * zs * (fx**2))
+    H = np.fft.fftshift(H)
+    U1=np.fft.fft(np.fft.fftshift(u3x))
+    U2 = H * U1
+    xdefocus = np.fft.ifftshift(np.fft.ifft(U2))
+    xdefocus = np.abs(xdefocus)**2
+    plt.figure()
+    plt.plot(xdefocus)
+
+    
 initialize()
-wavelengthlist = np.linspace(780*10**(-9),820*10**(-9),num=3)
+wavelengthlist = np.linspace(780*10**(-9),820*10**(-9),num=1)
+
 for lamb in wavelengthlist:
     prop(lamb)
 #lamb = 800*10**(-9) 
@@ -163,7 +183,6 @@ if __name__ == '__main__':
     pool = Pool()
     pool.map(prop, wavelengthlist)
 """  
-
 
 
 
