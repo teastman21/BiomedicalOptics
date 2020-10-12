@@ -106,31 +106,27 @@ def prop(lamm):
     #final coordinates
     #fc = np.meshgrid(u3x,u3y)
         #need to turn fc into x y pairs!
-    fc = np.column_stack((u3x,u3y))
-    I=np.abs(fc)**2
+    #fc = np.column_stack((u3x,u3y))
+    #I=np.abs(fc)**2
+    
     fx = (-1 / (2 * dx3) + np.arange(0,M-1,1)*1/L3X)
+    
     #attempt to defocus 
-    def propTF(u1,L,fx,lam,z):
-        """defocus around the focal plane 
-        """
         
-        H = np.exp(1j *math.pi * lam * z * (fx**2))
-        H = np.fft.fftshift(H)
-        U1=np.fft.fft(np.fft.fftshift(u1))
-        U2 = H * U1
-        xdefocus = np.fft.ifftshift(np.fft.ifft(U2))
-        xdefocus = np.abs(xdefocus)**2
-        return xdefocus
+    H = np.exp(1j *math.pi * lam1 * zs * (fx**2))
+    H = np.fft.fftshift(H)
+    U1=np.fft.fft(np.fft.fftshift(u3x))
+    U2 = H * U1
+    xdefocus = np.fft.ifftshift(np.fft.ifft(U2))
+    xdefocus = np.abs(xdefocus)**2
     plt.figure()
-    plt.plot(propTF(u3x,L,fx,lam1,zs))
+    plt.plot(xdefocus)
 
     
 
 wavelengthlist = np.linspace(780*10**(-9),820*10**(-9),num=1)
 for lamb in wavelengthlist:
     prop(lamb)
-    
-
 
 
 
