@@ -70,13 +70,10 @@ def prop(lamm):
     
     #U1X,U1Y = np.meshgrid(u1x,u1y)
     #plot beam after tilt applied
-    #I=np.abs(U1X)**2
-   # plt.figure()
+
     plotU1X = np.abs(u1x)**2
     x1c = np.append(x1c,plotU1X)
-    #plt.plot(np.abs(u1x)**2)
-    #plt.show()
-    #plt.figure()
+
     #plt.plot(np.abs(u1y)**2)
     
     #propagate to the focal plane (x)
@@ -99,12 +96,9 @@ def prop(lamm):
     #plot beam at fourier plane
     #U2X,U2Y = np.meshgrid(u2x,u2y)
     #I=np.abs(U2X)**2
-    #plt.figure()
     plotU2X = np.abs(u2x)**2
     x2c = np.append(x2c,plotU2X)
-    #plt.plot(np.abs(u2x)**2)
-    #plt.show()
-    #plt.figure()
+
     #plt.plot(np.abs(u2y)**2)
         
     #propagate to output focal plane
@@ -123,36 +117,18 @@ def prop(lamm):
     u3y = 1/(1j * lam1 * f2)*(np.fft.ifftshift(np.fft.fft(np.fft.fftshift(u2y))))*dy2 
     #plot beam at output plane
     #U3X,U3Y = np.meshgrid(u3x,u3y)
-    #I=np.abs(U3X)**2
-    #plt.plot(np.abs(u3x)**2)
     plotU3X = np.abs(u3x)**2
     x3c = np.append(x3c,plotU3X)
     #plt.plot(np.abs(u3y)**2)
     
-    
-    #final coordinates
-    #fc = np.meshgrid(u3x,u3y)
-        #need to turn fc into x y pairs!
-   # fc = np.column_stack((u3x,u3y))
-   # I=np.abs(fc)**2
-
+ 
 #for use with parallel kernels
 initialize()
 wavelengthlist = np.linspace(780*10**(-9),820*10**(-9),num=3)
 for lamb in wavelengthlist:
     prop(lamb)
 #lamb = 800*10**(-9) 
-"""
-plt.figure()
-plt.plot(x1c[1:M-1])
-plt.plot(x1c[M:])
-plt.figure()
-plt.plot(x2c[1:M-1])
-plt.plot(x2c[M:])
-plt.figure()
-plt.plot(x3c[1:M-1])
-plt.plot(x3c[M:])
-"""
+
 def display(x1c,x2c,x3c):
     """displays plots at the focal plane at different wavelengths
     """
