@@ -12,7 +12,23 @@ Created on Wed Sep 30 21:51:19 2020
 import numpy as np
 import math as math
 import matplotlib.pyplot as plt
+from multiprocessing import Pool
 
+global x1c
+global x2c
+global x3c
+M = 2**10
+
+def initialize():
+    """initialize the np arrays for the coordinate build up
+        only run once at beginning!
+        """
+    global x1c
+    global x2c
+    global x3c
+    x1c = np.array([])
+    x2c = np.array([])
+    x3c = np.array([])
 
 def prop(lamm): 
     # Define necessary variables
@@ -25,7 +41,12 @@ def prop(lamm):
     w = 0.002       #beam width
     L = 1.05
     M = 2**10
+
     zs = 100        #defocus slices
+    global x1c
+    global x2c
+    global x3c
+    
     #multiplied these two by a hundred due to CPU memory constraints @ output
     dx = L / M
     dy = L / M
@@ -45,12 +66,11 @@ def prop(lamm):
     
     #U1X,U1Y = np.meshgrid(u1x,u1y)
     #plot beam after tilt applied
-    #I=np.abs(U1X)**2
-    plt.figure()
-    plt.plot(np.abs(u1x)**2)
-    
-    plt.figure()
-    plt.plot(np.abs(u1y)**2)
+
+    plotU1X = np.abs(u1x)**2
+    x1c = np.append(x1c,plotU1X)
+
+    #plt.plot(np.abs(u1y)**2)
     
     #propagate to the focal plane (x)
     L2X = lam1 * f1 / dx
@@ -72,11 +92,10 @@ def prop(lamm):
     #plot beam at fourier plane
     #U2X,U2Y = np.meshgrid(u2x,u2y)
     #I=np.abs(U2X)**2
-    plt.figure()
-    plt.plot(np.abs(u2x)**2)
-    
-    plt.figure()
-    plt.plot(np.abs(u2y)**2)
+    plotU2X = np.abs(u2x)**2
+    x2c = np.append(x2c,plotU2X)
+
+    #plt.plot(np.abs(u2y)**2)
         
     #propagate to output focal plane
     L3X = lam1 * f2 / dx2
@@ -92,13 +111,13 @@ def prop(lamm):
     #propagate beam with fourier transform
     u3x = 1/(1j * lam1 * f2)*(np.fft.ifftshift(np.fft.fft(np.fft.fftshift(u2x))))*dx2 
     u3y = 1/(1j * lam1 * f2)*(np.fft.ifftshift(np.fft.fft(np.fft.fftshift(u2y))))*dy2 
-    
     #plot beam at output plane
     #U3X,U3Y = np.meshgrid(u3x,u3y)
-    #I=np.abs(U3X)**2
-    plt.figure()
-    plt.plot(np.abs(u3x)**2)
+    plotU3X = np.abs(u3x)**2
+    x3c = np.append(x3c,plotU3X)
+    #plt.plot(np.abs(u3y)**2)
     
+
     plt.figure()
     plt.plot(np.abs(u3y)**2)
     
@@ -123,12 +142,47 @@ def prop(lamm):
     plt.plot(xdefocus)
 
     
-
+initialize()
 wavelengthlist = np.linspace(780*10**(-9),820*10**(-9),num=1)
+
 for lamb in wavelengthlist:
     prop(lamb)
+#lamb = 800*10**(-9) 
 
+def display(x1c,x2c,x3c):
+    """displays plots at the focal plane at different wavelengths
+    """
+    x = 0
+    y = 1
+    plt.figure()
+    while x <= len(x1c):
+        plt.plot(x1c[x:y*M])
+        x = y * M
+        y = y + 1
+    
+    x = 0
+    y = 1
+    plt.figure()
+    while x <= len(x2c):
+        plt.plot(x2c[x:y*M])
+        x = y * M
+        y = y + 1
+        
+    x = 0
+    y = 1
+    plt.figure()
+    while x <= len(x3c):
+        plt.plot(x3c[x:y*M])
+        x = y * M
+        y = y + 1
 
+display(x1c,x2c,x3c)
+
+"""
+if __name__ == '__main__':
+    pool = Pool()
+    pool.map(prop, wavelengthlist)
+"""  
 
 
 
