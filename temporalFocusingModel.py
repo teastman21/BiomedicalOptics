@@ -9,6 +9,8 @@ Created on Wed Sep 30 21:51:19 2020
 """
 
 # import necessary packages 
+import sys
+sys.modules[__name__].__dict__.clear()
 import numpy as np
 import math as math
 import matplotlib.pyplot as plt
@@ -17,7 +19,7 @@ from multiprocessing import Pool
 global x1c
 global x2c
 global x3c
-M = 2**10
+M = 2**12
 
 def initialize():
     """initialize the np arrays for the coordinate build up
@@ -26,9 +28,11 @@ def initialize():
     global x1c
     global x2c
     global x3c
+    global xdf
     x1c = np.array([])
     x2c = np.array([])
     x3c = np.array([])
+    xdf = np.empty([M-1])
 
 def prop(lamm): 
     # Define necessary variables
@@ -40,12 +44,13 @@ def prop(lamm):
     m = 1           #diffraction order
     w = 0.002       #beam width
     L = 1.05
-    M = 2**10
+    
 
-    zs = 100        #defocus slices
+    zs = 30        #defocus slices
     global x1c
     global x2c
     global x3c
+    global xdf
     
     #multiplied these two by a hundred due to CPU memory constraints @ output
     dx = L / M
@@ -88,7 +93,6 @@ def prop(lamm):
     #propagate beam with the fourier transform
     u2x = 1/(1j * lam1 * f1)*(np.fft.ifftshift(np.fft.fft(np.fft.fftshift(u1x))))*dx
     u2y = 1/(1j * lam1 * f1)*(np.fft.ifftshift(np.fft.fft(np.fft.fftshift(u1y))))*dy
-    print(u2x)
     #plot beam at fourier plane
     #U2X,U2Y = np.meshgrid(u2x,u2y)
     #I=np.abs(U2X)**2
@@ -118,8 +122,8 @@ def prop(lamm):
     #plt.plot(np.abs(u3y)**2)
     
 
-    plt.figure()
-    plt.plot(np.abs(u3y)**2)
+    #plt.figure()
+    #plt.plot(np.abs(u3y)**2)
     
     
     #final coordinates
@@ -129,27 +133,24 @@ def prop(lamm):
     #I=np.abs(fc)**2
     
     fx = (-1 / (2 * dx3) + np.arange(0,M-1,1)*1/L3X)
+    #attempt to defocus
+    z = 1
+    zrange = 1*10**(-3)
+    zlist = np.linspace(-zrange,zrange,zs)
+    while z < zs:    
+        H = np.exp(1j *math.pi * lam1 * zlist[z] * (fx**2))
+        H = np.fft.fftshift(H)
+        U1=np.fft.fft(np.fft.fftshift(u3x))
+        U2 = H * U1
+        xdefocus = np.fft.ifftshift(np.fft.ifft(U2))
+        xdefocus = np.abs(xdefocus)**2
+        xdf = np.vstack((xdf,xdefocus))
+        z = z + 1
+    #plt.figure()
+    #plt.plot(xdefocus)
+    print(x1c)   
     
-    #attempt to defocus 
-        
-    H = np.exp(1j *math.pi * lam1 * zs * (fx**2))
-    H = np.fft.fftshift(H)
-    U1=np.fft.fft(np.fft.fftshift(u3x))
-    U2 = H * U1
-    xdefocus = np.fft.ifftshift(np.fft.ifft(U2))
-    xdefocus = np.abs(xdefocus)**2
-    plt.figure()
-    plt.plot(xdefocus)
-
-    
-initialize()
-wavelengthlist = np.linspace(780*10**(-9),820*10**(-9),num=1)
-
-for lamb in wavelengthlist:
-    prop(lamb)
-#lamb = 800*10**(-9) 
-
-def display(x1c,x2c,x3c):
+def display(x1c,x2c,x3c,xdefocus):
     """displays plots at the focal plane at different wavelengths
     """
     x = 0
@@ -175,14 +176,33 @@ def display(x1c,x2c,x3c):
         plt.plot(x3c[x:y*M])
         x = y * M
         y = y + 1
+    
+    x = 0
+    y = 1
+    plt.figure()
+    while x <= len(xdf):
+        plt.plot(xdf[x:y*M])
+        x = y * M
+        y = y + 1
 
-display(x1c,x2c,x3c)
+    
+initialize()
+#wavelengthlist = np.linspace(780*10**(-9),820*10**(-9),num=2)
 
-"""
-if __name__ == '__main__':
-    pool = Pool()
-    pool.map(prop, wavelengthlist)
-"""  
+#for lamb in wavelengthlist:
+prop(820*10**(-9))
+    
+display(x1c,x2c,x3c,xdf)
+
+#xdf = xdf.reshape(M-1,3)
+plt.imshow(xdf,aspect='auto')
+
+
+#if __name__ == '__main__':
+#    wavelengthlist = np.linspace(780*10**(-9),820*10**(-9),num=2)
+#    pool = Pool()
+#    display(pool.map(prop, wavelengthlist))
+    
 
 
 
