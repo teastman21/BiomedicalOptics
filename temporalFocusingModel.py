@@ -19,7 +19,7 @@ from multiprocessing import Pool
 global x1c
 global x2c
 global x3c
-M = 2**12
+M = 2**10
 
 def initialize():
     """initialize the np arrays for the coordinate build up
@@ -32,7 +32,7 @@ def initialize():
     x1c = np.array([])
     x2c = np.array([])
     x3c = np.array([])
-    xdf = np.empty([M-1])
+    xdf = np.zeros([M-1])
 
 def prop(lamm): 
     # Define necessary variables
@@ -45,7 +45,7 @@ def prop(lamm):
     w = 0.002       #beam width
     L = 1.05
     
-
+    global zs
     zs = 30        #defocus slices
     global x1c
     global x2c
@@ -148,11 +148,12 @@ def prop(lamm):
         z = z + 1
     #plt.figure()
     #plt.plot(xdefocus)
-    print(x1c)   
+     
     
 def display(x1c,x2c,x3c,xdefocus):
     """displays plots at the focal plane at different wavelengths
     """
+    global zs
     x = 0
     y = 1
     plt.figure()
@@ -176,34 +177,36 @@ def display(x1c,x2c,x3c,xdefocus):
         plt.plot(x3c[x:y*M])
         x = y * M
         y = y + 1
-    
+
     x = 0
     y = 1
+    p = 0
+    zzz = zs
     plt.figure()
     while x <= len(xdf):
-        plt.plot(xdf[x:y*M])
+        plt.imshow(xdf[p:zzz,x:y*M],aspect='auto')
         x = y * M
         y = y + 1
-
+        p = y * zs
+        zzz = zzz + zs
     
 initialize()
-#wavelengthlist = np.linspace(780*10**(-9),820*10**(-9),num=2)
-
-#for lamb in wavelengthlist:
-prop(820*10**(-9))
-    
+wavelengthlist = np.linspace(780*10**(-9),820*10**(-9),num=2)
+for lamb in wavelengthlist:
+    prop(lamb)    
 display(x1c,x2c,x3c,xdf)
 
 #xdf = xdf.reshape(M-1,3)
-plt.imshow(xdf,aspect='auto')
+#plt.imshow(xdf,aspect='auto')
 
 
 #if __name__ == '__main__':
 #    wavelengthlist = np.linspace(780*10**(-9),820*10**(-9),num=2)
 #    pool = Pool()
 #    display(pool.map(prop, wavelengthlist))
-    
 
+plt.imshow("one",xdf[0:30],aspect='auto')
+plt.imshow("two",xdf[30:],aspect='auto')
 
 
 
