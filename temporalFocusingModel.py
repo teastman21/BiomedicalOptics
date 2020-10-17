@@ -10,7 +10,6 @@ Created on Wed Sep 30 21:51:19 2020
 
 # import necessary packages 
 import sys
-sys.modules[__name__].__dict__.clear()
 import numpy as np
 import math as math
 import matplotlib.pyplot as plt
@@ -32,7 +31,7 @@ def initialize():
     x1c = np.array([])
     x2c = np.array([])
     x3c = np.array([])
-    xdf = np.empty([M-1])
+    xdf = np.zeros([M-1])
 
 def prop(lamm): 
     # Define necessary variables
@@ -121,16 +120,6 @@ def prop(lamm):
     x3c = np.append(x3c,plotU3X)
     #plt.plot(np.abs(u3y)**2)
     
-
-    #plt.figure()
-    #plt.plot(np.abs(u3y)**2)
-    
-    
-    #final coordinates
-    #fc = np.meshgrid(u3x,u3y)
-        #need to turn fc into x y pairs!
-    #fc = np.column_stack((u3x,u3y))
-    #I=np.abs(fc)**2
     
     fx = (-1 / (2 * dx3) + np.arange(0,M-1,1)*1/L3X)
     #attempt to defocus
@@ -148,9 +137,9 @@ def prop(lamm):
         z = z + 1
     #plt.figure()
     #plt.plot(xdefocus)
-    print(x1c)   
+    #print(x1c)   
     
-def display(x1c,x2c,x3c,xdefocus):
+def display(x1c,x2c,x3c):
     """displays plots at the focal plane at different wavelengths
     """
     x = 0
@@ -176,25 +165,20 @@ def display(x1c,x2c,x3c,xdefocus):
         plt.plot(x3c[x:y*M])
         x = y * M
         y = y + 1
-    
-    x = 0
-    y = 1
-    plt.figure()
-    while x <= len(xdf):
-        plt.plot(xdf[x:y*M])
-        x = y * M
-        y = y + 1
 
     
 initialize()
-#wavelengthlist = np.linspace(780*10**(-9),820*10**(-9),num=2)
+wavelengthlist = np.linspace(780*10**(-9),800*10**(-9),num=3)
+for lamb in wavelengthlist:
+    prop(lamb)
 
-#for lamb in wavelengthlist:
-prop(820*10**(-9))
-    
-display(x1c,x2c,x3c,xdf)
+#xdf=np.delete(xdf,1)    
+display(x1c,x2c,x3c)
+#delete initialization array
+xdf = np.delete(xdf,0,0)
+print(xdf)
+#xdf= np.delete(xdf,0)
 
-#xdf = xdf.reshape(M-1,3)
 plt.imshow(xdf,aspect='auto')
 
 
