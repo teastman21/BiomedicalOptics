@@ -19,7 +19,7 @@ from multiprocessing import Pool
 global x1c
 global x2c
 global x3c
-M = 2**12
+M = 2**14
 
 def initialize():
     """initialize the np arrays for the coordinate build up
@@ -69,13 +69,10 @@ def prop(lamm):
     u1x = np.exp(-x ** 2 / (2 * w ** 2))* np.exp(-1j * k * (x * np.sin(thetaD)))
     u1y = np.exp(-y ** 2 / (2 * w ** 2))
     
-    #U1X,U1Y = np.meshgrid(u1x,u1y)
-    #plot beam after tilt applied
 
+    #plot beam after tilt applied
     plotU1X = np.abs(u1x)**2
     x1c = np.append(x1c,plotU1X)
-
-    #plt.plot(np.abs(u1y)**2)
     
     #propagate to the focal plane (x)
     L2X = lam1 * f1 / dx
@@ -94,12 +91,9 @@ def prop(lamm):
     u2x = 1/(1j * lam1 * f1)*(np.fft.ifftshift(np.fft.fft(np.fft.fftshift(u1x))))*dx
     u2y = 1/(1j * lam1 * f1)*(np.fft.ifftshift(np.fft.fft(np.fft.fftshift(u1y))))*dy
     #plot beam at fourier plane
-    #U2X,U2Y = np.meshgrid(u2x,u2y)
-    #I=np.abs(U2X)**2
+  
     plotU2X = np.abs(u2x)**2
     x2c = np.append(x2c,plotU2X)
-
-    #plt.plot(np.abs(u2y)**2)
         
     #propagate to output focal plane
     L3X = lam1 * f2 / dx2
@@ -116,21 +110,9 @@ def prop(lamm):
     u3x = 1/(1j * lam1 * f2)*(np.fft.ifftshift(np.fft.fft(np.fft.fftshift(u2x))))*dx2 
     u3y = 1/(1j * lam1 * f2)*(np.fft.ifftshift(np.fft.fft(np.fft.fftshift(u2y))))*dy2 
     #plot beam at output plane
-    #U3X,U3Y = np.meshgrid(u3x,u3y)
+    
     plotU3X = np.abs(u3x)**2
     x3c = np.append(x3c,plotU3X)
-    #plt.plot(np.abs(u3y)**2)
-    
-
-    #plt.figure()
-    #plt.plot(np.abs(u3y)**2)
-    
-    
-    #final coordinates
-    #fc = np.meshgrid(u3x,u3y)
-        #need to turn fc into x y pairs!
-    #fc = np.column_stack((u3x,u3y))
-    #I=np.abs(fc)**2
     
     fx = (-1 / (2 * dx3) + np.arange(0,M-1,1)*1/L3X)
     #attempt to defocus
@@ -146,15 +128,12 @@ def prop(lamm):
         xdefocus = np.abs(xdefocus)**2
         xdf = np.vstack((xdf,xdefocus))
         z = z + 1
-    #plt.figure()
-    #plt.plot(xdefocus)
-     
+  
     
-def display(x1c,x2c,x3c):
+def display(x1c,x2c,x3c,xdf):
     """displays plots at the focal plane at different wavelengths
     """
     global zs
-    global xdf
     x = 0
     y = 1
     plt.figure()
@@ -187,19 +166,14 @@ def display(x1c,x2c,x3c):
     zzz = zs - 1
     #plt.figure()
     xdf=np.delete(xdf,0,0)
-    print(len(xdf))
-    print(xdf)
     while zzz <= len(xdf)+1:
         #plt.imshow(xdf[p:zzz],aspect='auto')
         name = 'defocusplot' + str(y) + '.png'
-        print(name)
         plt.imsave(name, xdf[p:zzz])
         p = zzz
         y = y + 1
         zzz = y * (zs - 1)
-        print(len(xdf))
-        print(zzz)
-        
+       
 initialize()
 
 
@@ -207,29 +181,5 @@ wavelengthlist = np.linspace(780*10**(-9),820*10**(-9),num=3)
 for lamb in wavelengthlist:
     prop(lamb)
   
-display(x1c,x2c,x3c)
+display(x1c,x2c,x3c,xdf)
 
-#xdf = xdf.reshape(M-1,3)
-#plt.imshow(xdf,aspect='auto')
-
-
-#if __name__ == '__main__':
-#    wavelengthlist = np.linspace(780*10**(-9),820*10**(-9),num=2)
-#    pool = Pool()
-#    display(pool.map(prop, wavelengthlist))
-
-#plt.imshow("one",xdf[0:30],aspect='auto')
-#plt.imshow("two",xdf[30:],aspect='auto')
-"""
-xdf=np.delete(xdf,0,0)
-print(xdf[0:zs-1])
-print("next")
-print(xdf[30:])
-plt.imshow(xdf[0:29],aspect='auto')
-"""
-
-
-im1=plt.imshow(xdf[1:29],aspect='auto')
-#im2=plt.imshow(xdf[29:58],aspect='auto')
-#im3=plt.imshow(xdf[58:88],aspect='auto')
-plt.show()
