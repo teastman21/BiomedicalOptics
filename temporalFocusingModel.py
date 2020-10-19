@@ -229,5 +229,7 @@ plt.imshow(xdf[0:29],aspect='auto')
 """
 
 
-
-
+im1=plt.imshow(xdf[1:29],aspect='auto')
+#im2=plt.imshow(xdf[29:58],aspect='auto')
+#im3=plt.imshow(xdf[58:88],aspect='auto')
+plt.show()
