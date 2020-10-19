@@ -166,14 +166,17 @@ def display(x1c,x2c,x3c,xdf):
     zzz = zs - 1
     #plt.figure()
     xdf=np.delete(xdf,0,0)
+    dfsum = np.empty([29,16383])
     while zzz <= len(xdf)+1:
         #plt.imshow(xdf[p:zzz],aspect='auto')
-        name = 'defocusplot' + str(y) + '.png'
-        plt.imsave(name, xdf[p:zzz])
+        #name = 'defocusplot' + str(y) + '.png'
+        #plt.imsave(name, xdf[p:zzz])
+        dfsum = dfsum + xdf[p:zzz]
         p = zzz
         y = y + 1
         zzz = y * (zs - 1)
-       
+        print(dfsum)
+    plt.imshow(dfsum,aspect='auto')
 initialize()
 
 
