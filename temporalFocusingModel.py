@@ -19,7 +19,7 @@ from multiprocessing import Pool
 global x1c
 global x2c
 global x3c
-M = 2**10
+M = 2**12
 
 def initialize():
     """initialize the np arrays for the coordinate build up
@@ -150,10 +150,11 @@ def prop(lamm):
     #plt.plot(xdefocus)
      
     
-def display(x1c,x2c,x3c,xdefocus):
+def display(x1c,x2c,x3c):
     """displays plots at the focal plane at different wavelengths
     """
     global zs
+    global xdf
     x = 0
     y = 1
     plt.figure()
@@ -161,6 +162,7 @@ def display(x1c,x2c,x3c,xdefocus):
         plt.plot(x1c[x:y*M])
         x = y * M
         y = y + 1
+    plt.savefig('plot1.png',format='png')
     
     x = 0
     y = 1
@@ -169,7 +171,8 @@ def display(x1c,x2c,x3c,xdefocus):
         plt.plot(x2c[x:y*M])
         x = y * M
         y = y + 1
-        
+    plt.savefig('plot2.png',format='png')   
+    
     x = 0
     y = 1
     plt.figure()
@@ -177,24 +180,34 @@ def display(x1c,x2c,x3c,xdefocus):
         plt.plot(x3c[x:y*M])
         x = y * M
         y = y + 1
-
-    x = 0
+    plt.savefig('plot3.png',format='png')
+    
     y = 1
     p = 0
-    zzz = zs
-    plt.figure()
-    while x <= len(xdf):
-        plt.imshow(xdf[p:zzz,x:y*M],aspect='auto')
-        x = y * M
+    zzz = zs - 1
+    #plt.figure()
+    xdf=np.delete(xdf,0,0)
+    print(len(xdf))
+    print(xdf)
+    while zzz <= len(xdf)+1:
+        #plt.imshow(xdf[p:zzz],aspect='auto')
+        name = 'defocusplot' + str(y) + '.png'
+        print(name)
+        plt.imsave(name, xdf[p:zzz])
+        p = zzz
         y = y + 1
-        p = y * zs
-        zzz = zzz + zs
-    
+        zzz = y * (zs - 1)
+        print(len(xdf))
+        print(zzz)
+        
 initialize()
-wavelengthlist = np.linspace(780*10**(-9),820*10**(-9),num=2)
+
+
+wavelengthlist = np.linspace(780*10**(-9),820*10**(-9),num=3)
 for lamb in wavelengthlist:
-    prop(lamb)    
-display(x1c,x2c,x3c,xdf)
+    prop(lamb)
+  
+display(x1c,x2c,x3c)
 
 #xdf = xdf.reshape(M-1,3)
 #plt.imshow(xdf,aspect='auto')
@@ -205,8 +218,16 @@ display(x1c,x2c,x3c,xdf)
 #    pool = Pool()
 #    display(pool.map(prop, wavelengthlist))
 
-plt.imshow("one",xdf[0:30],aspect='auto')
-plt.imshow("two",xdf[30:],aspect='auto')
+#plt.imshow("one",xdf[0:30],aspect='auto')
+#plt.imshow("two",xdf[30:],aspect='auto')
+"""
+xdf=np.delete(xdf,0,0)
+print(xdf[0:zs-1])
+print("next")
+print(xdf[30:])
+plt.imshow(xdf[0:29],aspect='auto')
+"""
+
 
 
 
