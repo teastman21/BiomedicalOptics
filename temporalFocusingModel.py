@@ -29,10 +29,12 @@ def initialize():
     global x2c
     global x3c
     global xdf
-    x1c = np.array([])
-    x2c = np.array([])
-    x3c = np.array([])
-    xdf = np.zeros([M-1])
+
+    x1c = np.empty([M-1])
+    x2c = np.empty([M-1])
+    x3c = np.empty([M-1])
+    xdf = np.empty([M-1])
+
 
 def prop(lamm): 
     # Define necessary variables
@@ -72,7 +74,8 @@ def prop(lamm):
 
     #plot beam after tilt applied
     plotU1X = np.abs(u1x)**2
-    x1c = np.append(x1c,plotU1X)
+
+    x1c = np.vstack((x1c,plotU1X))
     
     #propagate to the focal plane (x)
     L2X = lam1 * f1 / dx
@@ -93,7 +96,8 @@ def prop(lamm):
     #plot beam at fourier plane
   
     plotU2X = np.abs(u2x)**2
-    x2c = np.append(x2c,plotU2X)
+    x2c = np.vstack((x2c,plotU2X))
+
         
     #propagate to output focal plane
     L3X = lam1 * f2 / dx2
@@ -112,7 +116,9 @@ def prop(lamm):
     #plot beam at output plane
     
     plotU3X = np.abs(u3x)**2
-    x3c = np.append(x3c,plotU3X)
+
+    x3c = np.vstack((x3c,plotU3X))
+
     
     fx = (-1 / (2 * dx3) + np.arange(0,M-1,1)*1/L3X)
     #attempt to defocus
@@ -128,61 +134,54 @@ def prop(lamm):
         xdefocus = np.abs(xdefocus)**2
         xdf = np.vstack((xdf,xdefocus))
         z = z + 1
-  
+    #plt.figure()
+    #plt.plot(xdefocus)
+   
     
-def display(x1c,x2c,x3c,xdf):
+def display(x1c,x2c,x3c):
     """displays plots at the focal plane at different wavelengths
     """
-    global zs
-    x = 0
-    y = 1
+    x = 1
     plt.figure()
     while x <= len(x1c):
-        plt.plot(x1c[x:y*M])
-        x = y * M
-        y = y + 1
+        plt.plot(x1c[x - 1])
+        x += 1
     plt.savefig('plot1.png',format='png')
     
-    x = 0
-    y = 1
+    x = 1
     plt.figure()
     while x <= len(x2c):
-        plt.plot(x2c[x:y*M])
-        x = y * M
-        y = y + 1
-    plt.savefig('plot2.png',format='png')   
+        plt.plot(x2c[x - 1])
+        x += 1
+    plt.savefig('plot2.png',format='png')
     
-    x = 0
-    y = 1
+    x = 1
     plt.figure()
     while x <= len(x3c):
-        plt.plot(x3c[x:y*M])
-        x = y * M
-        y = y + 1
+        plt.plot(x3c[x - 1])
+        x += 1
     plt.savefig('plot3.png',format='png')
     
+    plt.figure()
     y = 1
     p = 0
     zzz = zs - 1
-    #plt.figure()
     xdf=np.delete(xdf,0,0)
     dfsum = np.empty([29,16383])
     while zzz <= len(xdf)+1:
-        #plt.imshow(xdf[p:zzz],aspect='auto')
-        #name = 'defocusplot' + str(y) + '.png'
-        #plt.imsave(name, xdf[p:zzz])
         dfsum = dfsum + xdf[p:zzz]
         p = zzz
         y = y + 1
         zzz = y * (zs - 1)
-        print(dfsum)
     plt.imshow(dfsum,aspect='auto')
+    plt.imshow(xdf,aspect='auto')
+    
 initialize()
-
-
-wavelengthlist = np.linspace(780*10**(-9),820*10**(-9),num=3)
+wavelengthlist = np.linspace(780*10**(-9),820*10**(-9),num=2)
 for lamb in wavelengthlist:
     prop(lamb)
-  
+    
 display(x1c,x2c,x3c,xdf)
+
+
 
