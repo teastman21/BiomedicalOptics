@@ -172,7 +172,7 @@ def display(x1c,x2c,x3c,xdf):
     p = 0
     zzz = zs - 1
     xdf=np.delete(xdf,0,0)
-    dfsum = np.empty([29,16383])
+    dfsum = np.empty([zs-1,M-1])
     while zzz <= len(xdf)+1:
         dfsum = dfsum + xdf[p:zzz]
         p = zzz
