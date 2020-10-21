@@ -19,7 +19,7 @@ from multiprocessing import Pool
 global x1c
 global x2c
 global x3c
-M = 2**12
+M = 2**14
 
 def initialize():
     """initialize the np arrays for the coordinate build up
@@ -29,10 +29,12 @@ def initialize():
     global x2c
     global x3c
     global xdf
+
     x1c = np.empty([M-1])
     x2c = np.empty([M-1])
     x3c = np.empty([M-1])
     xdf = np.empty([M-1])
+
 
 def prop(lamm): 
     # Define necessary variables
@@ -45,7 +47,7 @@ def prop(lamm):
     w = 0.002       #beam width
     L = 1.05
     
-
+    global zs
     zs = 30        #defocus slices
     global x1c
     global x2c
@@ -69,13 +71,11 @@ def prop(lamm):
     u1x = np.exp(-x ** 2 / (2 * w ** 2))* np.exp(-1j * k * (x * np.sin(thetaD)))
     u1y = np.exp(-y ** 2 / (2 * w ** 2))
     
-    #U1X,U1Y = np.meshgrid(u1x,u1y)
+
     #plot beam after tilt applied
-
     plotU1X = np.abs(u1x)**2
-    x1c = np.vstack((x1c,plotU1X))
 
-    #plt.plot(np.abs(u1y)**2)
+    x1c = np.vstack((x1c,plotU1X))
     
     #propagate to the focal plane (x)
     L2X = lam1 * f1 / dx
@@ -94,12 +94,10 @@ def prop(lamm):
     u2x = 1/(1j * lam1 * f1)*(np.fft.ifftshift(np.fft.fft(np.fft.fftshift(u1x))))*dx
     u2y = 1/(1j * lam1 * f1)*(np.fft.ifftshift(np.fft.fft(np.fft.fftshift(u1y))))*dy
     #plot beam at fourier plane
-    #U2X,U2Y = np.meshgrid(u2x,u2y)
-    #I=np.abs(U2X)**2
+  
     plotU2X = np.abs(u2x)**2
     x2c = np.vstack((x2c,plotU2X))
 
-    #plt.plot(np.abs(u2y)**2)
         
     #propagate to output focal plane
     L3X = lam1 * f2 / dx2
@@ -116,21 +114,11 @@ def prop(lamm):
     u3x = 1/(1j * lam1 * f2)*(np.fft.ifftshift(np.fft.fft(np.fft.fftshift(u2x))))*dx2 
     u3y = 1/(1j * lam1 * f2)*(np.fft.ifftshift(np.fft.fft(np.fft.fftshift(u2y))))*dy2 
     #plot beam at output plane
-    #U3X,U3Y = np.meshgrid(u3x,u3y)
+    
     plotU3X = np.abs(u3x)**2
-    x3c = np.vstack((x3c,plotU3X))
-    #plt.plot(np.abs(u3y)**2)
-    
 
-    #plt.figure()
-    #plt.plot(np.abs(u3y)**2)
-    
-    
-    #final coordinates
-    #fc = np.meshgrid(u3x,u3y)
-        #need to turn fc into x y pairs!
-    #fc = np.column_stack((u3x,u3y))
-    #I=np.abs(fc)**2
+    x3c = np.vstack((x3c,plotU3X))
+
     
     fx = (-1 / (2 * dx3) + np.arange(0,M-1,1)*1/L3X)
     #attempt to defocus
@@ -158,19 +146,34 @@ def display(x1c,x2c,x3c):
     while x <= len(x1c):
         plt.plot(x1c[x - 1])
         x += 1
+    plt.savefig('plot1.png',format='png')
+    
     x = 1
     plt.figure()
     while x <= len(x2c):
         plt.plot(x2c[x - 1])
         x += 1
-        
+    plt.savefig('plot2.png',format='png')
+    
     x = 1
     plt.figure()
     while x <= len(x3c):
         plt.plot(x3c[x - 1])
         x += 1
+    plt.savefig('plot3.png',format='png')
     
     plt.figure()
+    y = 1
+    p = 0
+    zzz = zs - 1
+    xdf=np.delete(xdf,0,0)
+    dfsum = np.empty([29,16383])
+    while zzz <= len(xdf)+1:
+        dfsum = dfsum + xdf[p:zzz]
+        p = zzz
+        y = y + 1
+        zzz = y * (zs - 1)
+    plt.imshow(dfsum,aspect='auto')
     plt.imshow(xdf,aspect='auto')
     
 initialize()
@@ -178,17 +181,7 @@ wavelengthlist = np.linspace(780*10**(-9),820*10**(-9),num=2)
 for lamb in wavelengthlist:
     prop(lamb)
     
-display(x1c,x2c,x3c)
-
-#xdf = xdf.reshape(M-1,3)
-
-
-#if __name__ == '__main__':
-#    wavelengthlist = np.linspace(780*10**(-9),820*10**(-9),num=2)
-#    pool = Pool()
-#    display(pool.map(prop, wavelengthlist))
-    
-
+display(x1c,x2c,x3c,xdf)
 
 
 
