@@ -30,9 +30,9 @@ def initialize():
     global x3c
     global xdf
 
-    x1c = np.empty([M-1])
-    x2c = np.empty([M-1])
-    x3c = np.empty([M-1])
+    x1c = np.array([])
+    x2c = np.array([])
+    x3c = np.array([])
     xdf = np.empty([M-1])
 
 
@@ -49,17 +49,20 @@ def prop(lamm):
     
     global zs
     zs = 30        #defocus slices
-    global x1c
-    global x2c
-    global x3c
+    #global x1c
+    #global x2c
+    #global x3c
     global xdf
+    x1c = np.array([])
+    x2c = np.array([])
+    x3c = np.array([])
     
     #multiplied these two by a hundred due to CPU memory constraints @ output
     dx = L / M
     dy = L / M
     x = np.arange(-L/2, L / 2 - dx + .000000000000000001, dx)
     y = np.arange(-L/2, L / 2 - dy + .000000000000000001, dy)
-    k = 2 * math.pi / lamC
+    k = 2 * math.pi / lamm
     #lam1 = 820 * 10 ** (-9)
     lam1 = lamm
     
@@ -68,14 +71,16 @@ def prop(lamm):
     thetaD = np.arcsin(m * lam1 * g - np.sin(thetaI))
     
     #initialize beam and apply tilt
-    u1x = np.exp(-x ** 2 / (2 * w ** 2))* np.exp(-1j * k * (x * np.sin(thetaD)))
+    u1x = np.exp(-x ** 2 / (2 * w ** 2))* np.exp(-1j * k * (x * np.sin(thetaD)))*np.exp
+    
     u1y = np.exp(-y ** 2 / (2 * w ** 2))
     
 
     #plot beam after tilt applied
     plotU1X = np.abs(u1x)**2
 
-    x1c = np.vstack((x1c,plotU1X))
+    #x1c = np.vstack((x1c,plotU1X))
+    x1c = plotU1X
     
     #propagate to the focal plane (x)
     L2X = lam1 * f1 / dx
@@ -96,8 +101,8 @@ def prop(lamm):
     #plot beam at fourier plane
   
     plotU2X = np.abs(u2x)**2
-    x2c = np.vstack((x2c,plotU2X))
-
+    #x2c = np.vstack((x2c,plotU2X))
+    x2c = plotU2X
         
     #propagate to output focal plane
     L3X = lam1 * f2 / dx2
@@ -117,9 +122,9 @@ def prop(lamm):
     
     plotU3X = np.abs(u3x)**2
 
-    x3c = np.vstack((x3c,plotU3X))
-
-    
+    #x3c = np.vstack((x3c,plotU3X))
+    x3c = plotU3X
+    ''' 
     fx = (-1 / (2 * dx3) + np.arange(0,M-1,1)*1/L3X)
     #attempt to defocus
     z = 1
@@ -136,7 +141,8 @@ def prop(lamm):
         z = z + 1
     #plt.figure()
     #plt.plot(xdefocus)
-   
+    '''
+    return x1c,x2c,x3c
     
 def display(x1c,x2c,x3c,xdf):
     """displays plots at the focal plane at different wavelengths
@@ -180,12 +186,32 @@ def display(x1c,x2c,x3c,xdf):
         zzz = y * (zs - 1)
     plt.imshow(dfsum,aspect='auto')
     
-initialize()
-wavelengthlist = np.linspace(780*10**(-9),820*10**(-9),num=5)
-for lamb in wavelengthlist:
-    prop(lamb)
-    
-display(x1c,x2c,x3c,xdf)
+#initialize()
+outSamp = np.empty([M-1])
+outFoc = np.empty([M-1])
+outDef = np.empty([M-1])
+lamT=9
+out1=np.empty([M-1,lamT])
+out2=np.empty([M-1,lamT])
+out3=np.empty([M-1,lamT])
 
+wavelengthlist = np.linspace(780*10**(-9),820*10**(-9),num=lamT)
+i = 0
+while i < len(wavelengthlist):
+    out1[:,i],out2[:,i],out3[:,i] = prop(wavelengthlist[i])
+    i += 1
+    
+         
+    
+"""
+def prop_wave(wavelength):
+    prop(wavelength)
+
+if __name__=='__main__':
+    pool = Pool()
+    pool.map(prop_wave,wavelengthlist)
+
+display(x1c,x2c,x3c,xdf)
+"""
 
 
