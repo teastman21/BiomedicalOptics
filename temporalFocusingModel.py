@@ -29,9 +29,9 @@ def initialize():
     global x2c
     global x3c
     global xdf
-    x1c = np.array([])
-    x2c = np.array([])
-    x3c = np.array([])
+    x1c = np.empty([M-1])
+    x2c = np.empty([M-1])
+    x3c = np.empty([M-1])
     xdf = np.empty([M-1])
 
 def prop(lamm): 
@@ -73,7 +73,7 @@ def prop(lamm):
     #plot beam after tilt applied
 
     plotU1X = np.abs(u1x)**2
-    x1c = np.append(x1c,plotU1X)
+    x1c = np.vstack((x1c,plotU1X))
 
     #plt.plot(np.abs(u1y)**2)
     
@@ -97,7 +97,7 @@ def prop(lamm):
     #U2X,U2Y = np.meshgrid(u2x,u2y)
     #I=np.abs(U2X)**2
     plotU2X = np.abs(u2x)**2
-    x2c = np.append(x2c,plotU2X)
+    x2c = np.vstack((x2c,plotU2X))
 
     #plt.plot(np.abs(u2y)**2)
         
@@ -118,7 +118,7 @@ def prop(lamm):
     #plot beam at output plane
     #U3X,U3Y = np.meshgrid(u3x,u3y)
     plotU3X = np.abs(u3x)**2
-    x3c = np.append(x3c,plotU3X)
+    x3c = np.vstack((x3c,plotU3X))
     #plt.plot(np.abs(u3y)**2)
     
 
@@ -148,54 +148,39 @@ def prop(lamm):
         z = z + 1
     #plt.figure()
     #plt.plot(xdefocus)
-    print(x1c)   
+   
     
-def display(x1c,x2c,x3c,xdefocus):
+def display(x1c,x2c,x3c):
     """displays plots at the focal plane at different wavelengths
     """
-    x = 0
-    y = 1
+    x = 1
     plt.figure()
     while x <= len(x1c):
-        plt.plot(x1c[x:y*M])
-        x = y * M
-        y = y + 1
-    
-    x = 0
-    y = 1
+        plt.plot(x1c[x - 1])
+        x += 1
+    x = 1
     plt.figure()
     while x <= len(x2c):
-        plt.plot(x2c[x:y*M])
-        x = y * M
-        y = y + 1
+        plt.plot(x2c[x - 1])
+        x += 1
         
-    x = 0
-    y = 1
+    x = 1
     plt.figure()
     while x <= len(x3c):
-        plt.plot(x3c[x:y*M])
-        x = y * M
-        y = y + 1
+        plt.plot(x3c[x - 1])
+        x += 1
     
-    x = 0
-    y = 1
     plt.figure()
-    while x <= len(xdf):
-        plt.plot(xdf[x:y*M])
-        x = y * M
-        y = y + 1
-
+    plt.imshow(xdf,aspect='auto')
     
 initialize()
-#wavelengthlist = np.linspace(780*10**(-9),820*10**(-9),num=2)
-
-#for lamb in wavelengthlist:
-prop(820*10**(-9))
+wavelengthlist = np.linspace(780*10**(-9),820*10**(-9),num=2)
+for lamb in wavelengthlist:
+    prop(lamb)
     
-display(x1c,x2c,x3c,xdf)
+display(x1c,x2c,x3c)
 
 #xdf = xdf.reshape(M-1,3)
-plt.imshow(xdf,aspect='auto')
 
 
 #if __name__ == '__main__':
