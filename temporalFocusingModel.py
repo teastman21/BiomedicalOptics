@@ -138,9 +138,14 @@ def prop(lamm):
     #plt.plot(xdefocus)
    
     
-def display(x1c,x2c,x3c):
+def display(x1c,x2c,x3c,xdf):
     """displays plots at the focal plane at different wavelengths
     """
+    #I NEED to figure out how to initialize truly empty array to avoid this steps
+    
+    x1c = x1c[1:]
+    x2c = x2c[1:]
+    x3c = x3c[1:]
     x = 1
     plt.figure()
     while x <= len(x1c):
@@ -174,10 +179,9 @@ def display(x1c,x2c,x3c):
         y = y + 1
         zzz = y * (zs - 1)
     plt.imshow(dfsum,aspect='auto')
-    plt.imshow(xdf,aspect='auto')
     
 initialize()
-wavelengthlist = np.linspace(780*10**(-9),820*10**(-9),num=2)
+wavelengthlist = np.linspace(780*10**(-9),820*10**(-9),num=5)
 for lamb in wavelengthlist:
     prop(lamb)
     
