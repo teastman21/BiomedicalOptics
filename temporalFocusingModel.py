@@ -36,7 +36,16 @@ def initialize():
     xdf = np.empty([M-1])
 
 
-def prop(lamm): 
+def incident(lam,thetaDcenter):
+    #determine diffraction angle
+    m = 1 #diffraction order
+    g = 120000 #grating density
+    lamC = 800*10**(-9) #center wavelength
+    thetaI = np.arcsin(m * lamC * g - np.sin(thetaDcenter))
+    thetaD = np.arcsin(m * lam * g - np.sin(thetaI))
+    return thetaD
+
+def prop(lamm,thetaD): 
     # Define necessary variables
     f1 = 0.5        #collimating lens focal length
     f2 = 9*10**-3   #objective lens focal length
@@ -49,9 +58,6 @@ def prop(lamm):
     
     global zs
     zs = 30        #defocus slices
-    #global x1c
-    #global x2c
-    #global x3c
     global xdf
     x1c = np.array([])
     x2c = np.array([])
@@ -66,12 +72,8 @@ def prop(lamm):
     #lam1 = 820 * 10 ** (-9)
     lam1 = lamm
     
-    #determine diffraction angle
-    thetaI = np.arcsin(m * lamC * g - np.sin(thetaDcenter))
-    thetaD = np.arcsin(m * lam1 * g - np.sin(thetaI))
-    
     #initialize beam and apply tilt
-    u1x = np.exp(-x ** 2 / (2 * w ** 2))* np.exp(-1j * k * (x * np.sin(thetaD)))*np.exp
+    u1x = np.exp(-x ** 2 / (2 * w ** 2))* np.exp(-1j * k * (x * np.sin(thetaD)))
     
     u1y = np.exp(-y ** 2 / (2 * w ** 2))
     
@@ -124,7 +126,7 @@ def prop(lamm):
 
     #x3c = np.vstack((x3c,plotU3X))
     x3c = plotU3X
-    ''' 
+    
     fx = (-1 / (2 * dx3) + np.arange(0,M-1,1)*1/L3X)
     #attempt to defocus
     z = 1
@@ -139,10 +141,12 @@ def prop(lamm):
         xdefocus = np.abs(xdefocus)**2
         xdf = np.vstack((xdf,xdefocus))
         z = z + 1
-    #plt.figure()
-    #plt.plot(xdefocus)
-    '''
+    plt.figure()
+    plt.plot(xdf)
+    
     return x1c,x2c,x3c
+
+#def defocus()
     
 def display(x1c,x2c,x3c,xdf):
     """displays plots at the focal plane at different wavelengths
@@ -194,14 +198,19 @@ lamT=9
 out1=np.empty([M-1,lamT])
 out2=np.empty([M-1,lamT])
 out3=np.empty([M-1,lamT])
-
-wavelengthlist = np.linspace(780*10**(-9),820*10**(-9),num=lamT)
+'''
+c=2.99792458*10**8
+lamC=800*10**-9
+omega0=2*math.pi*c/lamC
+omegar=0.05*10**15
+nwavelengths = 2*10**8
+frequencylist = np.linspace(omega0-omegar,omega0+omegar,nwavelengths)
 i = 0
 while i < len(wavelengthlist):
     out1[:,i],out2[:,i],out3[:,i] = prop(wavelengthlist[i])
     i += 1
     
-         
+'''         
     
 """
 def prop_wave(wavelength):
@@ -210,8 +219,7 @@ def prop_wave(wavelength):
 if __name__=='__main__':
     pool = Pool()
     pool.map(prop_wave,wavelengthlist)
-
-display(x1c,x2c,x3c,xdf)
 """
+display(x1c,x2c,x3c,xdf)
 
 
