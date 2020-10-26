@@ -25,15 +25,9 @@ def initialize():
     """initialize the np arrays for the coordinate build up
         only run once at beginning!
         """
-    global x1c
-    global x2c
-    global x3c
     global xdf
-
-    x1c = np.array([])
-    x2c = np.array([])
-    x3c = np.array([])
     xdf = np.empty([M-1])
+
 
 
 def prop(lamm): 
@@ -71,7 +65,7 @@ def prop(lamm):
     thetaD = np.arcsin(m * lam1 * g - np.sin(thetaI))
     
     #initialize beam and apply tilt
-    u1x = np.exp(-x ** 2 / (2 * w ** 2))* np.exp(-1j * k * (x * np.sin(thetaD)))*np.exp
+    u1x = np.exp(-x ** 2 / (2 * w ** 2))* np.exp(-1j * k * (x * np.sin(thetaD)))
     
     u1y = np.exp(-y ** 2 / (2 * w ** 2))
     
@@ -186,22 +180,45 @@ def display(x1c,x2c,x3c,xdf):
         zzz = y * (zs - 1)
     plt.imshow(dfsum,aspect='auto')
     
-#initialize()
+initialize()
 outSamp = np.empty([M-1])
 outFoc = np.empty([M-1])
 outDef = np.empty([M-1])
-lamT=9
+lamT=5
 out1=np.empty([M-1,lamT])
 out2=np.empty([M-1,lamT])
 out3=np.empty([M-1,lamT])
 
-wavelengthlist = np.linspace(780*10**(-9),820*10**(-9),num=lamT)
+lambda0 = 800*10**-9
+c = 2.99792458*10**8
+omega0 = 2 * math.pi * c / lambda0
+omegar = 0.05 *10**15
+omega = np.linspace(omega0-omegar,omega0+omegar,num=lamT)
+lamIn=2*math.pi*c/omega
+
+
 i = 0
-while i < len(wavelengthlist):
-    out1[:,i],out2[:,i],out3[:,i] = prop(wavelengthlist[i])
+while i < len(lamIn):
+    out1[:,i],out2[:,i],out3[:,i] = prop(lamIn[i])
     i += 1
+xdf=np.delete(xdf,0,0)
+
+def defocusPlot():
+    plt.figure()
+    y = 1
+    p = 0
+    zzz = zs - 1
+    dfsum = np.empty([zs-1,M-1])
+    while zzz <= len(xdf) + 1:
+        dfsum = dfsum + xdf[p:zzz]
+        p = zzz
+        y = y + 1
+        zzz = y * (zs - 1)
+    plt.imshow(dfsum,aspect='auto')
+
+def hello(xdf):
+    print(xdf)
     
-         
     
 """
 def prop_wave(wavelength):
