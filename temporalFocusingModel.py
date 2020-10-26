@@ -9,8 +9,6 @@ Created on Wed Sep 30 21:51:19 2020
 """
 
 # import necessary packages 
-import sys
-sys.modules[__name__].__dict__.clear()
 import numpy as np
 import math as math
 import matplotlib.pyplot as plt
@@ -21,11 +19,13 @@ global x2c
 global x3c
 M = 2**14
 global xdf
+global defocusM
 xdf = np.empty([M-1])
 
+global zs
+zs = 30 
 
-
-def prop(lamm): 
+def prop(lamm,i): 
     # Define necessary variables
     f1 = 0.5        #collimating lens focal length
     f2 = 9*10**-3   #objective lens focal length
@@ -36,12 +36,16 @@ def prop(lamm):
     w = 0.002       #beam width
     L = 1.05
     
-    global zs
-    zs = 30        #defocus slices
+    global zs       #defocus slices
     #global x1c
     #global x2c
     #global x3c
     global xdf
+    global dx3
+    global L3X
+    global lam1
+    global u3x
+    global defocusM
     x1c = np.array([])
     x2c = np.array([])
     x3c = np.array([])
@@ -113,7 +117,8 @@ def prop(lamm):
 
     #x3c = np.vstack((x3c,plotU3X))
     x3c = plotU3X
-
+    #defocusCalc()
+    defocusM[:,:,i] = defocusCalc()
     return x1c,x2c,x3c
     
 def display(x1c,x2c,x3c,xdf):
@@ -159,29 +164,7 @@ def display(x1c,x2c,x3c,xdf):
     plt.imshow(dfsum,aspect='auto')
     
 
-outSamp = np.empty([M-1])
-outFoc = np.empty([M-1])
-outDef = np.empty([M-1])
-lamT=5
-out1=np.empty([M-1,lamT])
-out2=np.empty([M-1,lamT])
-out3=np.empty([M-1,lamT])
-
-lambda0 = 800*10**-9
-c = 2.99792458*10**8
-omega0 = 2 * math.pi * c / lambda0
-omegar = 0.05 *10**15
-omega = np.linspace(omega0-omegar,omega0+omegar,num=lamT)
-lamIn=2*math.pi*c/omega
-
-
-i = 0
-while i < len(lamIn):
-    out1[:,i],out2[:,i],out3[:,i] = prop(lamIn[i])
-    i += 1
-#xdf=np.delete(xdf,0,0)
-
-def defocusPlot():
+def defocusPlot(xdf):
     plt.figure()
     y = 1
     p = 0
@@ -194,11 +177,9 @@ def defocusPlot():
         zzz = y * (zs - 1)
     plt.imshow(dfsum,aspect='auto')
 
-def hello(xdf):
-    print(xdf)
-
-
 def defocusCalc():
+    global xdf
+    xdf = np.empty([M-1])
     fx = (-1 / (2 * dx3) + np.arange(0,M-1,1)*1/L3X)
     #attempt to defocus
     z = 1
@@ -213,9 +194,47 @@ def defocusCalc():
         xdefocus = np.abs(xdefocus)**2
         xdf = np.vstack((xdf,xdefocus))
         z = z + 1
+    return xdf
     #plt.figure()
     #plt.plot(xdefocus)
-    
+
+outSamp = np.empty([M-1])
+outFoc = np.empty([M-1])
+outDef = np.empty([M-1])
+lamT=3
+out1=np.empty([M-1,lamT])
+out2=np.empty([M-1,lamT])
+out3=np.empty([M-1,lamT])
+
+lambda0 = 800*10**-9
+c = 2.99792458*10**8
+omega0 = 2 * math.pi * c / lambda0
+omegar = 0.05 *10**15
+omega = np.linspace(omega0-omegar,omega0+omegar,num=lamT)
+lamIn=2*math.pi*c/omega
+
+defocusM = np.empty([zs, M-1,lamT])
+i = 0
+while i < len(lamIn):
+    out1[:,i],out2[:,i],out3[:,i] = prop(lamIn[i],i)
+    i += 1
+#xdf=np.delete(xdf,0,0)
+
+plt.figure()
+y = 1
+p = 0
+zzz = zs - 1
+dfsum = np.sum(defocusM,axis=2)
+'''
+while zzz < len(defocusM):
+    dfsum = dfsum + defocusM[p:zzz]
+    p = zzz
+    y = y + 1
+    zzz = y * (zs - 1)
+'''
+
+plt.imshow(dfsum,aspect='auto')
+
 """
 def prop_wave(wavelength):
     prop(wavelength)
