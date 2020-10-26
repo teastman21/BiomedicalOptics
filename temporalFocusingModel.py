@@ -20,13 +20,8 @@ global x1c
 global x2c
 global x3c
 M = 2**14
-
-def initialize():
-    """initialize the np arrays for the coordinate build up
-        only run once at beginning!
-        """
-    global xdf
-    xdf = np.empty([M-1])
+global xdf
+xdf = np.empty([M-1])
 
 
 
@@ -118,24 +113,7 @@ def prop(lamm):
 
     #x3c = np.vstack((x3c,plotU3X))
     x3c = plotU3X
-    ''' 
-    fx = (-1 / (2 * dx3) + np.arange(0,M-1,1)*1/L3X)
-    #attempt to defocus
-    z = 1
-    zrange = 1*10**(-3)
-    zlist = np.linspace(-zrange,zrange,zs)
-    while z < zs:    
-        H = np.exp(1j *math.pi * lam1 * zlist[z] * (fx**2))
-        H = np.fft.fftshift(H)
-        U1=np.fft.fft(np.fft.fftshift(u3x))
-        U2 = H * U1
-        xdefocus = np.fft.ifftshift(np.fft.ifft(U2))
-        xdefocus = np.abs(xdefocus)**2
-        xdf = np.vstack((xdf,xdefocus))
-        z = z + 1
-    #plt.figure()
-    #plt.plot(xdefocus)
-    '''
+
     return x1c,x2c,x3c
     
 def display(x1c,x2c,x3c,xdf):
@@ -180,7 +158,7 @@ def display(x1c,x2c,x3c,xdf):
         zzz = y * (zs - 1)
     plt.imshow(dfsum,aspect='auto')
     
-initialize()
+
 outSamp = np.empty([M-1])
 outFoc = np.empty([M-1])
 outDef = np.empty([M-1])
@@ -201,7 +179,7 @@ i = 0
 while i < len(lamIn):
     out1[:,i],out2[:,i],out3[:,i] = prop(lamIn[i])
     i += 1
-xdf=np.delete(xdf,0,0)
+#xdf=np.delete(xdf,0,0)
 
 def defocusPlot():
     plt.figure()
@@ -218,7 +196,25 @@ def defocusPlot():
 
 def hello(xdf):
     print(xdf)
-    
+
+
+def defocusCalc():
+    fx = (-1 / (2 * dx3) + np.arange(0,M-1,1)*1/L3X)
+    #attempt to defocus
+    z = 1
+    zrange = 1*10**(-3)
+    zlist = np.linspace(-zrange,zrange,zs)
+    while z < zs:    
+        H = np.exp(1j *math.pi * lam1 * zlist[z] * (fx**2))
+        H = np.fft.fftshift(H)
+        U1=np.fft.fft(np.fft.fftshift(u3x))
+        U2 = H * U1
+        xdefocus = np.fft.ifftshift(np.fft.ifft(U2))
+        xdefocus = np.abs(xdefocus)**2
+        xdf = np.vstack((xdf,xdefocus))
+        z = z + 1
+    #plt.figure()
+    #plt.plot(xdefocus)
     
 """
 def prop_wave(wavelength):
