@@ -53,24 +53,25 @@ def prop(lamm,i):
     #multiplied these two by a hundred due to CPU memory constraints @ output
     dx = L / M
     dy = L / M
-    x = np.arange(-L/2, L / 2 - dx + .000000000000000001, dx)
+    x = np.arange(-L/2, L / 2 - dx + .000000000000000001, dx,dtype=np.float32)
+    print(x.dtype)
     y = np.arange(-L/2, L / 2 - dy + .000000000000000001, dy)
     k = 2 * math.pi / lamm
     #lam1 = 820 * 10 ** (-9)
     lam1 = lamm
     
     #determine diffraction angle
-    thetaI = np.arcsin(m * lamC * g - np.sin(thetaDcenter))
-    thetaD = np.arcsin(m * lam1 * g - np.sin(thetaI))
-    
+    thetaI = np.arcsin(m * lamC * g - np.sin(thetaDcenter),dtype=np.float32)
+    thetaD = np.arcsin(m * lam1 * g - np.sin(thetaI),dtype=np.float32)
+    print(thetaI.dtype)
     #initialize beam and apply tilt
     u1x = np.exp(-x ** 2 / (2 * w ** 2))* np.exp(-1j * k * (x * np.sin(thetaD)))
-    
+    print(u1x.dtype)
     u1y = np.exp(-y ** 2 / (2 * w ** 2))
     
 
     #plot beam after tilt applied
-    plotU1X = np.abs(u1x)**2
+    plotU1X = np.abs(u1x,dtype=np.float32)**2
 
     #x1c = np.vstack((x1c,plotU1X))
     x1c = plotU1X
@@ -93,7 +94,7 @@ def prop(lamm,i):
     u2y = 1/(1j * lam1 * f1)*(np.fft.ifftshift(np.fft.fft(np.fft.fftshift(u1y))))*dy
     #plot beam at fourier plane
   
-    plotU2X = np.abs(u2x)**2
+    plotU2X = np.abs(u2x,dtype=np.float32)**2
     #x2c = np.vstack((x2c,plotU2X))
     x2c = plotU2X
         
@@ -113,7 +114,7 @@ def prop(lamm,i):
     u3y = 1/(1j * lam1 * f2)*(np.fft.ifftshift(np.fft.fft(np.fft.fftshift(u2y))))*dy2 
     #plot beam at output plane
     
-    plotU3X = np.abs(u3x)**2
+    plotU3X = np.abs(u3x,dtype=np.float32)**2
 
     #x3c = np.vstack((x3c,plotU3X))
     x3c = plotU3X
@@ -123,12 +124,12 @@ def prop(lamm,i):
 
 def defocusCalc():
     global xdf
-    xdf = np.empty([M-1])
+    xdf = np.empty([M-1],dtype=np.float32)
     fx = (-1 / (2 * dx3) + np.arange(0,M-1,1)*1/L3X)
     #attempt to defocus
     z = 1
     zrange = 1*10**(-3)
-    zlist = np.linspace(-zrange,zrange,zs)
+    zlist = np.linspace(-zrange,zrange,zs,dtype=np.float32)
     while z < zs:    
         H = np.exp(1j *math.pi * lam1 * zlist[z] * (fx**2))
         H = np.fft.fftshift(H)
@@ -142,13 +143,13 @@ def defocusCalc():
     #plt.figure()
     #plt.plot(xdefocus)
 
-outSamp = np.empty([M-1])
-outFoc = np.empty([M-1])
-outDef = np.empty([M-1])
+outSamp = np.empty([M-1],dtype=np.float32)
+outFoc = np.empty([M-1],dtype=np.float32)
+outDef = np.empty([M-1],dtype=np.float32)
 lamT=3
-out1=np.empty([M-1,lamT])
-out2=np.empty([M-1,lamT])
-out3=np.empty([M-1,lamT])
+out1=np.empty([M-1,lamT],dtype=np.float32)
+out2=np.empty([M-1,lamT],dtype=np.float32)
+out3=np.empty([M-1,lamT],dtype=np.float32)
 
 lambda0 = 800*10**-9
 c = 2.99792458*10**8
@@ -157,7 +158,7 @@ omegar = 0.05 *10**15
 omega = np.linspace(omega0-omegar,omega0+omegar,num=lamT)
 lamIn=2*math.pi*c/omega
 
-defocusM = np.empty([zs, M-1,lamT])
+defocusM = np.empty([zs, M-1,lamT],dtype=np.float32)
 i = 0
 while i < len(lamIn):
     out1[:,i],out2[:,i],out3[:,i] = prop(lamIn[i],i)
@@ -168,7 +169,7 @@ while i < len(lamIn):
 y = 1
 p = 0
 zzz = zs - 1
-dfsum = np.sum(defocusM,axis=2)
+dfsum = np.sum(defocusM,axis=2,dtype=np.float32)
 plt.imsave('defocusImage.png',dfsum)
 '''
 while zzz < len(defocusM):
