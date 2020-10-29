@@ -120,62 +120,6 @@ def prop(lamm,i):
     #defocusCalc()
     defocusM[:,:,i] = defocusCalc()
     return x1c,x2c,x3c
-    
-def display(x1c,x2c,x3c,xdf):
-    """displays plots at the focal plane at different wavelengths
-    """
-    #I NEED to figure out how to initialize truly empty array to avoid this steps
-    
-    x1c = x1c[1:]
-    x2c = x2c[1:]
-    x3c = x3c[1:]
-    x = 1
-    plt.figure()
-    while x <= len(x1c):
-        plt.plot(x1c[x - 1])
-        x += 1
-    plt.savefig('plot1.png',format='png')
-    
-    x = 1
-    plt.figure()
-    while x <= len(x2c):
-        plt.plot(x2c[x - 1])
-        x += 1
-    plt.savefig('plot2.png',format='png')
-    
-    x = 1
-    plt.figure()
-    while x <= len(x3c):
-        plt.plot(x3c[x - 1])
-        x += 1
-    plt.savefig('plot3.png',format='png')
-    
-    plt.figure()
-    y = 1
-    p = 0
-    zzz = zs - 1
-    xdf=np.delete(xdf,0,0)
-    dfsum = np.empty([zs-1,M-1])
-    while zzz <= len(xdf)+1:
-        dfsum = dfsum + xdf[p:zzz]
-        p = zzz
-        y = y + 1
-        zzz = y * (zs - 1)
-    plt.imshow(dfsum,aspect='auto')
-    
-
-def defocusPlot(xdf):
-    plt.figure()
-    y = 1
-    p = 0
-    zzz = zs - 1
-    dfsum = np.empty([zs-1,M-1])
-    while zzz <= len(xdf) + 1:
-        dfsum = dfsum + xdf[p:zzz]
-        p = zzz
-        y = y + 1
-        zzz = y * (zs - 1)
-    plt.imshow(dfsum,aspect='auto')
 
 def defocusCalc():
     global xdf
@@ -220,11 +164,12 @@ while i < len(lamIn):
     i += 1
 #xdf=np.delete(xdf,0,0)
 
-plt.figure()
+#plt.figure()
 y = 1
 p = 0
 zzz = zs - 1
 dfsum = np.sum(defocusM,axis=2)
+plt.imsave('defocusImage.png',dfsum)
 '''
 while zzz < len(defocusM):
     dfsum = dfsum + defocusM[p:zzz]
@@ -233,7 +178,12 @@ while zzz < len(defocusM):
     zzz = y * (zs - 1)
 '''
 
-plt.imshow(dfsum,aspect='auto')
+#plt.imshow(dfsum,aspect='auto')
+
+# Function to save code
+def formSave():
+    np.save("defocusM.npy",defocusM)
+formSave()
 
 """
 def prop_wave(wavelength):
