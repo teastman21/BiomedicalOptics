@@ -13,6 +13,8 @@ import numpy as np
 import math as math
 import matplotlib.pyplot as plt
 from multiprocessing import Pool
+from datetime import datetime
+start = datetime.now()
 
 global x1c
 global x2c
@@ -54,7 +56,6 @@ def prop(lamm,i):
     dx = L / M
     dy = L / M
     x = np.arange(-L/2, L / 2 - dx + .000000000000000001, dx,dtype=np.float32)
-    print(x.dtype)
     y = np.arange(-L/2, L / 2 - dy + .000000000000000001, dy)
     k = 2 * math.pi / lamm
     #lam1 = 820 * 10 ** (-9)
@@ -63,10 +64,8 @@ def prop(lamm,i):
     #determine diffraction angle
     thetaI = np.arcsin(m * lamC * g - np.sin(thetaDcenter),dtype=np.float32)
     thetaD = np.arcsin(m * lam1 * g - np.sin(thetaI),dtype=np.float32)
-    print(thetaI.dtype)
     #initialize beam and apply tilt
     u1x = np.exp(-x ** 2 / (2 * w ** 2))* np.exp(-1j * k * (x * np.sin(thetaD)))
-    print(u1x.dtype)
     u1y = np.exp(-y ** 2 / (2 * w ** 2))
     
 
@@ -123,7 +122,7 @@ def prop(lamm,i):
     return x1c,x2c,x3c
 
 def defocusCalc():
-    global xdf
+    #global xdf
     xdf = np.empty([M-1],dtype=np.float32)
     fx = (-1 / (2 * dx3) + np.arange(0,M-1,1)*1/L3X)
     #attempt to defocus
@@ -185,6 +184,7 @@ while zzz < len(defocusM):
 def formSave():
     np.save("defocusM.npy",defocusM)
 formSave()
+print(datetime.now()-start)
 
 """
 def prop_wave(wavelength):
