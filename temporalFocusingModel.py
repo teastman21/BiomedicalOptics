@@ -20,6 +20,7 @@ global x1c
 global x2c
 global x3c
 M = 2**14
+lamT=3
 global xdf
 global defocusM
 xdf = np.empty([M-1])
@@ -39,9 +40,6 @@ def prop(lamm,i):
     L = 1.05
     
     global zs       #defocus slices
-    #global x1c
-    #global x2c
-    #global x3c
     global xdf
     global dx3
     global L3X
@@ -54,9 +52,9 @@ def prop(lamm,i):
     
     #multiplied these two by a hundred due to CPU memory constraints @ output
     dx = L / M
-    dy = L / M
+    #dy = L / M
     x = np.arange(-L/2, L / 2 - dx + .000000000000000001, dx,dtype=np.float32)
-    y = np.arange(-L/2, L / 2 - dy + .000000000000000001, dy)
+    #y = np.arange(-L/2, L / 2 - dy + .000000000000000001, dy)
     k = 2 * math.pi / lamm
     #lam1 = 820 * 10 ** (-9)
     lam1 = lamm
@@ -66,7 +64,7 @@ def prop(lamm,i):
     thetaD = np.arcsin(m * lam1 * g - np.sin(thetaI),dtype=np.float32)
     #initialize beam and apply tilt
     u1x = np.exp(-x ** 2 / (2 * w ** 2))* np.exp(-1j * k * (x * np.sin(thetaD)))
-    u1y = np.exp(-y ** 2 / (2 * w ** 2))
+    #u1y = np.exp(-y ** 2 / (2 * w ** 2))
     
 
     #plot beam after tilt applied
@@ -81,16 +79,16 @@ def prop(lamm,i):
     
     
     #y
-    L2Y = lam1 * f1 / dx
-    dy2 = lam1 * f1 / L
+    #L2Y = lam1 * f1 / dx
+    #dy2 = lam1 * f1 / L
     
     #create coordinates at focal plane
     xfoc1 = -L2X / 2 + np.arange(0, M - 1) * dx2
-    yfoc1  = -L2Y / 2 + np.arange(0, M - 1) * dy2
+    #yfoc1  = -L2Y / 2 + np.arange(0, M - 1) * dy2
     
     #propagate beam with the fourier transform
     u2x = 1/(1j * lam1 * f1)*(np.fft.ifftshift(np.fft.fft(np.fft.fftshift(u1x))))*dx
-    u2y = 1/(1j * lam1 * f1)*(np.fft.ifftshift(np.fft.fft(np.fft.fftshift(u1y))))*dy
+    #u2y = 1/(1j * lam1 * f1)*(np.fft.ifftshift(np.fft.fft(np.fft.fftshift(u1y))))*dy
     #plot beam at fourier plane
   
     plotU2X = np.abs(u2x,dtype=np.float32)**2
@@ -101,16 +99,16 @@ def prop(lamm,i):
     L3X = lam1 * f2 / dx2
     dx3 = lam1 * f2 / L2X
     
-    L3Y = lam1 * f2 / dy2
-    dy3 = lam1 * f2 / L2Y
+    #L3Y = lam1 * f2 / dy2
+    #dy3 = lam1 * f2 / L2Y
      
     #create coordinates at output focal plane
     xfoc2 = -L3X / 2 + np.arange(0, M - 1) * dx3
-    yfoc2 = -L3Y / 2 + np.arange(0, M - 1) * dy3
+    #yfoc2 = -L3Y / 2 + np.arange(0, M - 1) * dy3
     
     #propagate beam with fourier transform
     u3x = 1/(1j * lam1 * f2)*(np.fft.ifftshift(np.fft.fft(np.fft.fftshift(u2x))))*dx2 
-    u3y = 1/(1j * lam1 * f2)*(np.fft.ifftshift(np.fft.fft(np.fft.fftshift(u2y))))*dy2 
+    #u3y = 1/(1j * lam1 * f2)*(np.fft.ifftshift(np.fft.fft(np.fft.fftshift(u2y))))*dy2 
     #plot beam at output plane
     
     plotU3X = np.abs(u3x,dtype=np.float32)**2
@@ -145,7 +143,6 @@ def defocusCalc():
 outSamp = np.empty([M-1],dtype=np.float32)
 outFoc = np.empty([M-1],dtype=np.float32)
 outDef = np.empty([M-1],dtype=np.float32)
-lamT=3
 out1=np.empty([M-1,lamT],dtype=np.float32)
 out2=np.empty([M-1,lamT],dtype=np.float32)
 out3=np.empty([M-1,lamT],dtype=np.float32)
@@ -169,7 +166,7 @@ y = 1
 p = 0
 zzz = zs - 1
 dfsum = np.sum(defocusM,axis=2,dtype=np.float32)
-plt.imsave('defocusImage.png',dfsum)
+plt.imshow(dfsum,aspect='auto')
 '''
 while zzz < len(defocusM):
     dfsum = dfsum + defocusM[p:zzz]
