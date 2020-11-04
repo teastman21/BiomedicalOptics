@@ -16,6 +16,8 @@ from multiprocessing import Pool
 from datetime import datetime
 start = datetime.now()
 
+
+
 global x1c
 global x2c
 global x3c
@@ -25,16 +27,18 @@ global zs
 
 zs = 30 
 M = 2**14
-lamT=3
-xdf = np.empty([M])
+lamT=2*4
 
-outSamp = np.empty([M],dtype=np.float32)
-outFoc = np.empty([M],dtype=np.float32)
-outDef = np.empty([M],dtype=np.float32)
-out1=np.empty([M,lamT],dtype=np.float32)
-out2=np.empty([M,lamT],dtype=np.float32)
-out3=np.empty([M,lamT],dtype=np.float32)
+#initialize necessary arrays
+xdf = np.empty([M-1])
+outSamp = np.empty([M-1],dtype=np.float32)
+outFoc = np.empty([M-1],dtype=np.float32)
+outDef = np.empty([M-1],dtype=np.float32)
+out1=np.empty([M-1,lamT],dtype=np.float32)
+out2=np.empty([M-1,lamT],dtype=np.float32)
+out3=np.empty([M-1,lamT],dtype=np.float32)
 
+#frequency information
 lambda0 = 800*10**-9
 c = 2.99792458*10**8
 omega0 = 2 * math.pi * c / lambda0
@@ -42,7 +46,7 @@ omegar = 0.05 *10**15
 omega = np.linspace(omega0-omegar,omega0+omegar,num=lamT)
 lamIn=2*math.pi*c/omega
 
-defocusM = np.empty([zs, M,lamT],dtype=np.float32)
+defocusM = np.empty([zs,lamT],dtype=np.float32)
 
 
 def prop(lamm,i): 
@@ -70,7 +74,7 @@ def prop(lamm,i):
     #multiplied these two by a hundred due to CPU memory constraints @ output
     dx = L / M
     #dy = L / M
-    x = np.arange(-L/2, L / 2 - dx + 0.0000000000001, dx,dtype=np.float32)
+    x = np.arange(-L/2, L / 2 - dx + .000000000000000001, dx,dtype=np.float32)
     #y = np.arange(-L/2, L / 2 - dy + .000000000000000001, dy)
     k = 2 * math.pi / lamm
     #lam1 = 820 * 10 ** (-9)
@@ -80,8 +84,11 @@ def prop(lamm,i):
     thetaI = np.arcsin(m * lamC * g - np.sin(thetaDcenter),dtype=np.float32)
     thetaD = np.arcsin(m * lam1 * g - np.sin(thetaI),dtype=np.float32)
     #initialize beam and apply tilt
-    u1x = np.exp(-x ** 2 / (2 * w ** 2))* np.exp(-1j * k * (x * np.sin(thetaD)))
-    print(np.shape(u1x))
+    #look at sydneys code to determine variable for 8*10**-9
+    #this will tell us what next step is
+    #integrate over X, number of points is much smaller
+    #parallel processing
+    u1x = np.exp(-x ** 2 / (2 * w ** 2))* np.exp(-1j * k * (x * np.sin(thetaD)))*np.exp(-lam1**2/(2*np.abs(8*10**-9)**2))
     #u1y = np.exp(-y ** 2 / (2 * w ** 2))
     
 
@@ -134,13 +141,13 @@ def prop(lamm,i):
     #x3c = np.vstack((x3c,plotU3X))
     x3c = plotU3X
     #defocusCalc()
-    defocusM[:,:,i] = defocusCalc()
+    defocusM[:,i] = defocusCalc()
     return x1c,x2c,x3c
 
 def defocusCalc():
     #global xdf
-    xdf = np.empty([M],dtype=np.float32)
-    fx = (-1 / (2 * dx3) + np.arange(0,M,1)*1/L3X)
+    xdf = np.empty([zs],dtype=np.float32)
+    fx = (-1 / (2 * dx3) + np.arange(0,M-1,1)*1/L3X)
     #attempt to defocus
     z = 1
     zrange = 1*10**(-3)
@@ -149,15 +156,16 @@ def defocusCalc():
         H = np.exp(1j *math.pi * lam1 * zlist[z] * (fx**2))
         H = np.fft.fftshift(H)
         U1=np.fft.fft(np.fft.fftshift(u3x))
-        print(np.shape(H))
         U2 = H * U1
         xdefocus = np.fft.ifftshift(np.fft.ifft(U2))
-        xdefocus = np.abs(xdefocus)**2
-        xdf = np.vstack((xdf,xdefocus))
+        xdefocus = np.sum(np.abs(xdefocus)**2)
+        xdf[z] = xdefocus
+        print(xdf[z])
         z = z + 1
     return xdf
     #plt.figure()
     #plt.plot(xdefocus)
+
 
 i = 0
 while i < len(lamIn):
@@ -169,8 +177,8 @@ while i < len(lamIn):
 y = 1
 p = 0
 zzz = zs - 1
-dfsum = np.sum(defocusM,axis=2,dtype=np.float32)
-plt.imshow(dfsum,aspect='auto')
+#dfsum = np.sum(defocusM,axis=2,dtype=np.float32)
+#plt.imshow(dfsum,aspect='auto')
 '''
 while zzz < len(defocusM):
     dfsum = dfsum + defocusM[p:zzz]
