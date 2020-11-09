@@ -14,6 +14,7 @@ import math as math
 import matplotlib.pyplot as plt
 from multiprocessing import Pool
 from datetime import datetime
+import multiprocessing
 start = datetime.now()
 
 
@@ -166,11 +167,10 @@ def defocusCalc():
     #plt.figure()
     #plt.plot(xdefocus)
 
-
-i = 0
-while i < len(lamIn):
-    out1[:,i],out2[:,i],out3[:,i] = prop(lamIn[i],i)
-    i += 1
+ind = [x for x in range(len(lamIn))]
+for i in ind:
+    with Pool(multiprocessing.cpu_count()-1) as p:
+        out1[:,i],out2[:,i],out3[:,i] = prop(lamIn[i],i)
 #xdf=np.delete(xdf,0,0)
 
 #plt.figure()
