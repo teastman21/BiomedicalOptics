@@ -134,9 +134,7 @@ def prop(lamm,i):
     #x3c = np.vstack((x3c,plotU3X))
     x3c = plotU3X
     #defocusCalc()
-    with Pool(multiprocessing.cpu_count()-1) as p:
-        defocusM[:,:,i] = p.map(defocusCalc, i)
-        #defocusM[:,:,i] = defocusCalc()
+    defocusM[:,:,i] = defocusCalc()
     return x1c,x2c,x3c
 
 def defocusCalc():
@@ -159,19 +157,18 @@ def defocusCalc():
     return xdf
     #plt.figure()
     #plt.plot(xdefocus)
-
+'''
 i = 0
 while i < len(lamIn):
     out1[:,i],out2[:,i],out3[:,i] = prop(lamIn[i],i)
     i += 1
 #xdf=np.delete(xdf,0,0)
-
 '''
+
 ind = [x for x in range(len(lamIn))]
 for i in ind:
     with Pool(multiprocessing.cpu_count()-1) as p:
         out1[:,i],out2[:,i],out3[:,i] = prop(lamIn[i],i)
-'''
 
 #plt.figure()
 dfsum = np.sum(defocusM,axis=2,dtype=np.float32)
