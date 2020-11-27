@@ -14,7 +14,6 @@ import math as math
 import matplotlib.pyplot as plt
 from multiprocessing import Pool
 from datetime import datetime
-import multiprocessing
 start = datetime.now()
 
 global x1c
@@ -26,7 +25,7 @@ global zs
 
 zs = 30 
 M = 2**14
-lamT = 3
+lamT=3
 xdf = np.empty([M])
 
 outSamp = np.empty([M],dtype=np.float32)
@@ -82,6 +81,7 @@ def prop(lamm,i):
     thetaD = np.arcsin(m * lam1 * g - np.sin(thetaI),dtype=np.float32)
     #initialize beam and apply tilt
     u1x = np.exp(-x ** 2 / (2 * w ** 2))* np.exp(-1j * k * (x * np.sin(thetaD)))
+    print(np.shape(u1x))
     #u1y = np.exp(-y ** 2 / (2 * w ** 2))
     
 
@@ -149,6 +149,7 @@ def defocusCalc():
         H = np.exp(1j *math.pi * lam1 * zlist[z] * (fx**2))
         H = np.fft.fftshift(H)
         U1=np.fft.fft(np.fft.fftshift(u3x))
+        print(np.shape(H))
         U2 = H * U1
         xdefocus = np.fft.ifftshift(np.fft.ifft(U2))
         xdefocus = np.abs(xdefocus)**2
@@ -157,27 +158,19 @@ def defocusCalc():
     return xdf
     #plt.figure()
     #plt.plot(xdefocus)
-'''
+
 i = 0
 while i < len(lamIn):
     out1[:,i],out2[:,i],out3[:,i] = prop(lamIn[i],i)
     i += 1
 #xdf=np.delete(xdf,0,0)
-'''
-
-ind = [x for x in range(len(lamIn))]
-for i in ind:
-    with Pool(multiprocessing.cpu_count()-1) as p:
-        out1[:,i],out2[:,i],out3[:,i] = prop(lamIn[i],i)
 
 #plt.figure()
+y = 1
+p = 0
+zzz = zs - 1
 dfsum = np.sum(defocusM,axis=2,dtype=np.float32)
-#plt.imshow(dfsum,aspect='auto')
-plt.imsave('defocusParallelTest.png',dfsum)
 plt.imshow(dfsum,aspect='auto')
-plt.figure()
-plt.plot(out2)
-plt.savefig('plot2Test.png')
 '''
 while zzz < len(defocusM):
     dfsum = dfsum + defocusM[p:zzz]

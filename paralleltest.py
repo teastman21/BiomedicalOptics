@@ -16,8 +16,6 @@ def par(x):
     return x*x
 
 if __name__=='__main__':
-    xx = 0
-    while xx < 10:
-        with Pool(multiprocessing.cpu_count()-1) as p:
-            print(par(xx))
-            xx +=1
+    with Pool(multiprocessing.cpu_count()-1) as p:
+        print(p.map(par,[1,2,3]))
+        
